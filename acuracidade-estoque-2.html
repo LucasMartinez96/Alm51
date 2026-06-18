@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Acuracidade — Inventário</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:      #0f1117;
+    --surface: #181c27;
+    --border:  #252b3b;
+    --accent:  #4f8ef7;
+    --ok:      #22c55e;
+    --warn:    #f59e0b;
+    --danger:  #ef4444;
+    --text:    #e2e8f0;
+    --muted:   #64748b;
+    --mono:    'IBM Plex Mono', monospace;
+    --sans:    'IBM Plex Sans', sans-serif;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 2.5rem 1rem 5rem;
+  }
+
+  /* ── Layout wrapper ── */
+  .wrap { width: 100%; max-width: 860px; }
+
+  /* ── Header ── */
+  header { margin-bottom: 2rem; }
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.14em; color: var(--accent);
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  h1 { font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
+  h1 span { color: var(--muted); font-weight: 300; }
+  .subtitle { margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+
+  /* ── Paste area ── */
+  label.paste-label {
+    display: block; font-family: var(--mono);
+    font-size: 0.7rem; letter-spacing: 0.1em;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  textarea {
+    width: 100%; height: 200px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text);
+    font-family: var(--mono); font-size: 0.78rem;
+    line-height: 1.5; padding: 1rem; resize: vertical;
+    transition: border-color 0.2s; outline: none;
+  }
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); opacity: 0.6; }
+
+  /* ── Buttons ── */
+  .btn-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; align-items: center; }
+  button {
+    font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
+    padding: 0.55rem 1.4rem; border-radius: 5px;
+    border: none; cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  button:active { transform: scale(0.97); }
+  .btn-primary  { background: var(--accent); color: #fff; }
+  .btn-ghost    { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+  .btn-danger   { background: transparent; border: 1px solid #7f1d1d; color: #fca5a5; font-size: 0.78rem; padding: 0.4rem 1rem; }
+  .btn-danger:hover { background: #2a1515; }
+
+  .info-badge {
+    margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted);
+    font-family: var(--mono); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.5rem 0.9rem; display: inline-block;
+  }
+  .info-badge b { color: var(--accent); }
+
+  /* ── Section divider ── */
+  .section { margin-top: 2rem; }
+  .section-header {
+    font-family: var(--mono); font-size: 0.7rem;
+    letter-spacing: 0.12em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 0.75rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* ── Result cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.2rem; }
+  .card-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
+  .card-value { font-family: var(--mono); font-size: 1.7rem; font-weight: 600; line-height: 1; }
+  .card-value.ok      { color: var(--ok); }
+  .card-value.warn    { color: var(--warn); }
+  .card-value.acc     { color: var(--accent); }
+  .card-value.neutral { color: var(--text); }
+  .card-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+
+  /* ── Progress bar ── */
+  .bar-section {
+    margin-top: 1.25rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.1rem 1.4rem;
+  }
+  .bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.6rem; }
+  .bar-label .name { color: var(--muted); }
+  .bar-label .pct  { font-family: var(--mono); font-weight: 600; }
+  .bar-track { width: 100%; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(.22,1,.36,1); background: linear-gradient(90deg, var(--ok), var(--accent)); }
+
+  /* ── Divergent detail ── */
+  details { margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  summary { padding: 0.8rem 1.2rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: '▶'; font-size: 0.6rem; transition: transform 0.2s; }
+  details[open] summary::before { transform: rotate(90deg); }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; font-family: var(--mono); }
+  thead th { background: var(--bg); color: var(--muted); text-align: left; padding: 0.5rem 0.9rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.65rem; white-space: nowrap; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody td { padding: 0.45rem 0.9rem; border-top: 1px solid var(--border); white-space: nowrap; color: var(--text); }
+  td.status-ok  { color: var(--ok); }
+  td.status-div { color: var(--warn); font-weight: 600; }
+
+  /* ── History section ── */
+  #secHistorico { margin-top: 3rem; }
+
+  .hist-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+  .hist-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+  }
+  .hist-card-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+  .hist-card-value { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; }
+  .hist-card-value.acc { color: var(--accent); }
+  .hist-card-sub  { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* sparkline mini-bars */
+  .spark { display: flex; align-items: flex-end; gap: 3px; height: 32px; margin-top: 0.5rem; }
+  .spark-bar {
+    flex: 1; border-radius: 2px 2px 0 0;
+    background: var(--accent); opacity: 0.5;
+    min-height: 3px;
+    transition: opacity 0.2s;
+    cursor: default;
+    position: relative;
+  }
+  .spark-bar:hover { opacity: 1; }
+  .spark-bar[data-today="1"] { opacity: 1; background: var(--ok); }
+
+  /* history table */
+  .hist-table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .hist-table-wrap table { width: 100%; }
+  .hist-table-wrap thead th {
+    background: var(--bg);
+    padding: 0.6rem 1rem;
+    font-size: 0.65rem;
+  }
+  .hist-table-wrap tbody td { padding: 0.55rem 1rem; font-size: 0.8rem; }
+  .hist-table-wrap tbody tr:last-child td { border-bottom: none; }
+  td.acc-cell { font-family: var(--mono); font-weight: 600; }
+  td.acc-high { color: var(--ok); }
+  td.acc-mid  { color: var(--warn); }
+  td.acc-low  { color: var(--danger); }
+  .today-badge {
+    display: inline-block;
+    font-size: 0.6rem; font-family: var(--mono);
+    background: rgba(79,142,247,0.15);
+    border: 1px solid rgba(79,142,247,0.3);
+    color: var(--accent);
+    border-radius: 3px; padding: 1px 5px; margin-left: 6px;
+    vertical-align: middle; text-transform: uppercase; letter-spacing: 0.05em;
+  }
+
+  /* empty state */
+  .hist-empty {
+    padding: 2.5rem 1.5rem; text-align: center;
+    color: var(--muted); font-size: 0.85rem;
+  }
+  .hist-empty span { display: block; font-size: 1.6rem; margin-bottom: 0.5rem; }
+
+  /* ── Error box ── */
+  .error-box { display: none; margin-top: 1rem; background: #2a1515; border: 1px solid #7f1d1d; border-radius: 6px; padding: 0.9rem 1.2rem; font-size: 0.82rem; color: #fca5a5; font-family: var(--mono); }
+
+  /* ── Toast notification ── */
+  #toast {
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1e2535; border: 1px solid var(--border);
+    border-radius: 6px; padding: 0.6rem 1.2rem;
+    font-size: 0.8rem; font-family: var(--mono);
+    color: var(--text); box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s;
+    opacity: 0; z-index: 999; white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ── Modal confirm ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem; max-width: 380px; width: 90%;
+  }
+  .modal h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+  .modal p  { font-size: 0.83rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+  .modal .modal-btns { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+  @media (max-width: 500px) {
+    h1 { font-size: 1.25rem; }
+    .card-value { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Ferramenta de Inventário</p>
+  <h1>Calculadora de Acuracidade <span>/ Estoque</span></h1>
+  <p class="subtitle">Cole a tabela copiada do Excel. Status calculado automaticamente: Qtd Sistema × Qtd Físico.</p>
+</header>
+
+<!-- ── Input ── -->
+<label class="paste-label" for="entrada">▸ Cole a tabela aqui</label>
+<textarea id="entrada" placeholder="Item	Subinventory	Locator	Qntd Sistema	Qntd Fisico	Item Description
+M000000537	71MG51ALM	10C-12F	2	2	BROCA DIA.21MM
+M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
+..."></textarea>
+
+<div class="btn-row">
+  <button class="btn-primary" id="btnCalc">▶ Calcular</button>
+  <button class="btn-ghost"   id="btnClear">Limpar</button>
+</div>
+<div class="info-badge">
+  Regra: <b>OK</b> quando Qntd Sistema = Qntd Físico &nbsp;|&nbsp; <b>Divergente</b> quando diferente
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<!-- ── Result ── -->
+<div id="resultado" style="display:none">
+  <div class="section">
+    <div class="section-header"><span>▸ Resultado de hoje</span></div>
+    <div class="cards">
+      <div class="card">
+        <div class="card-label">Total de Itens</div>
+        <div class="card-value neutral" id="cTotal">—</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Itens OK ✅</div>
+        <div class="card-value ok" id="cOk">—</div>
+        <div class="card-sub" id="cOkPct"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Itens Divergentes ⚠️</div>
+        <div class="card-value warn" id="cDiv">—</div>
+        <div class="card-sub" id="cDivPct"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Acuracidade</div>
+        <div class="card-value acc" id="cAcc">—</div>
+      </div>
+    </div>
+
+    <div class="bar-section">
+      <div class="bar-label">
+        <span class="name">Acuracidade do inventário</span>
+        <span class="pct" id="barPct">—</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+    </div>
+
+    <details>
+      <summary>Ver linhas divergentes</summary>
+      <div class="table-wrap">
+        <table><thead id="tHead"></thead><tbody id="tBody"></tbody></table>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- ── History ── -->
+<div id="secHistorico">
+  <div class="section-header">
+    <span>▸ Histórico de Acuracidade</span>
+    <button class="btn-danger" id="btnLimparHist">🗑 Limpar histórico</button>
+  </div>
+
+  <!-- summary cards -->
+  <div class="hist-summary-cards" id="histSummaryCards" style="display:none">
+    <div class="hist-card">
+      <div class="hist-card-label">Acuracidade Média Geral</div>
+      <div class="hist-card-value acc" id="hMediaGeral">—</div>
+      <div class="hist-card-sub" id="hMediaSub"></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-card-label">Melhor Dia</div>
+      <div class="hist-card-value" style="color:var(--ok)" id="hMelhor">—</div>
+      <div class="hist-card-sub" id="hMelhorDia"></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-card-label">Pior Dia</div>
+      <div class="hist-card-value" style="color:var(--warn)" id="hPior">—</div>
+      <div class="hist-card-sub" id="hPiorDia"></div>
+    </div>
+    <div class="hist-card">
+      <div class="hist-card-label">Evolução (últimos dias)</div>
+      <div class="spark" id="sparkLine"></div>
+    </div>
+  </div>
+
+  <!-- history table -->
+  <div class="hist-table-wrap" id="histTableWrap">
+    <div class="hist-empty" id="histEmpty">
+      <span>📋</span>
+      Nenhum histórico ainda.<br>Calcule ao menos uma vez para começar a registrar.
+    </div>
+    <table id="histTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Total</th>
+          <th>OK ✅</th>
+          <th>Divergentes ⚠️</th>
+          <th>Acuracidade</th>
+          <th>Divergência</th>
+        </tr>
+      </thead>
+      <tbody id="histBody"></tbody>
+    </table>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<!-- ── Toast ── -->
+<div id="toast"></div>
+
+<!-- ── Modal ── -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Limpar histórico?</h3>
+    <p>Todos os registros salvos serão apagados permanentemente. Essa ação não pode ser desfeita.</p>
+    <div class="modal-btns">
+      <button class="btn-ghost" id="modalCancel">Cancelar</button>
+      <button class="btn-danger" id="modalConfirm" style="font-size:0.85rem;padding:0.55rem 1.2rem">Sim, apagar tudo</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  UTILITIES
+// ═══════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+
+function norm(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+}
+function toNumber(s) {
+  return parseFloat((s || '').replace(',', '.').trim());
+}
+function fmt(n) {
+  return n.toFixed(2).replace('.', ',') + '%';
+}
+function todayStr() {
+  const d = new Date();
+  return String(d.getDate()).padStart(2,'0') + '/' +
+         String(d.getMonth()+1).padStart(2,'0') + '/' +
+         d.getFullYear();
+}
+function showToast(msg) {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => t.classList.remove('show'), 2800);
+}
+function detectSep(line) {
+  const tabs  = (line.match(/\t/g)  || []).length;
+  const commas= (line.match(/,/g)   || []).length;
+  const semis = (line.match(/;/g)   || []).length;
+  if (tabs >= commas && tabs >= semis) return '\t';
+  if (semis > commas) return ';';
+  return ',';
+}
+function isHeaderRow(row) {
+  const j = row.join(' ').toLowerCase();
+  return j.includes('item') || j.includes('status') ||
+         j.includes('subinventory') || j.includes('locator') ||
+         j.includes('qntd') || j.includes('quantidade') ||
+         j.includes('description') || j.includes('descrição');
+}
+function findCol(headers, ...candidates) {
+  for (const h of headers) {
+    const n = norm(h);
+    for (const c of candidates) {
+      if (n.includes(norm(c))) return headers.indexOf(h);
+    }
+  }
+  return -1;
+}
+function accClass(v) {
+  if (v >= 99)   return 'acc-high';
+  if (v >= 95)   return 'acc-mid';
+  return 'acc-low';
+}
+
+// ═══════════════════════════════════════════════
+//  STORAGE
+// ═══════════════════════════════════════════════
+const STORAGE_KEY = 'inv_acuracidade_hist_v1';
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+  } catch(e) { return {}; }
+}
+function saveHistory(hist) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
+}
+function addRecord(record) {
+  const hist = loadHistory();
+  hist[record.date] = record;   // overwrites same date
+  saveHistory(hist);
+}
+function clearHistory() {
+  localStorage.removeItem(STORAGE_KEY);
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER HISTORY
+// ═══════════════════════════════════════════════
+function renderHistory() {
+  const hist   = loadHistory();
+  const keys   = Object.keys(hist).sort((a, b) => {
+    // sort by date descending (dd/mm/yyyy → comparable)
+    const parse = s => { const [d,m,y] = s.split('/'); return new Date(y,m-1,d); };
+    return parse(b) - parse(a);
+  });
+
+  const summaryEl = $('histSummaryCards');
+  const tableEl   = $('histTable');
+  const emptyEl   = $('histEmpty');
+  const bodyEl    = $('histBody');
+  const today     = todayStr();
+
+  if (keys.length === 0) {
+    summaryEl.style.display = 'none';
+    tableEl.style.display   = 'none';
+    emptyEl.style.display   = 'block';
+    return;
+  }
+
+  emptyEl.style.display   = 'none';
+  summaryEl.style.display = 'grid';
+  tableEl.style.display   = 'table';
+
+  // ── Summary cards ──
+  const vals = keys.map(k => hist[k].acc);
+  const avg  = vals.reduce((a,b) => a+b, 0) / vals.length;
+  const maxV = Math.max(...vals);
+  const minV = Math.min(...vals);
+  const maxD = keys[vals.indexOf(maxV)];
+  const minD = keys[vals.indexOf(minV)];
+
+  $('hMediaGeral').textContent = fmt(avg);
+  $('hMediaSub').textContent   = `${keys.length} dia${keys.length > 1 ? 's' : ''} registrado${keys.length > 1 ? 's' : ''}`;
+  $('hMelhor').textContent     = fmt(maxV);
+  $('hMelhorDia').textContent  = maxD;
+  $('hPior').textContent       = fmt(minV);
+  $('hPiorDia').textContent    = minD;
+
+  // ── Sparkline (last 10 days, chronological) ──
+  const sparkKeys = [...keys].reverse().slice(-10);
+  const sparkEl   = $('sparkLine');
+  sparkEl.innerHTML = '';
+  const sparkMax = Math.max(...sparkKeys.map(k => hist[k].acc), 1);
+  sparkKeys.forEach(k => {
+    const bar = document.createElement('div');
+    bar.className = 'spark-bar';
+    const pct = (hist[k].acc / sparkMax) * 100;
+    bar.style.height = pct + '%';
+    if (k === today) bar.dataset.today = '1';
+    bar.title = `${k}: ${fmt(hist[k].acc)}`;
+    sparkEl.appendChild(bar);
+  });
+
+  // ── Table rows ──
+  bodyEl.innerHTML = '';
+  keys.forEach(k => {
+    const r  = hist[k];
+    const tr = document.createElement('tr');
+    const isToday = k === today;
+
+    const tdDate = document.createElement('td');
+    tdDate.innerHTML = k + (isToday ? '<span class="today-badge">hoje</span>' : '');
+
+    const tdTotal = document.createElement('td'); tdTotal.textContent = r.total;
+    const tdOk    = document.createElement('td'); tdOk.textContent    = r.ok;    tdOk.style.color = 'var(--ok)';
+    const tdDiv   = document.createElement('td'); tdDiv.textContent   = r.div;   tdDiv.style.color = r.div > 0 ? 'var(--warn)' : 'var(--muted)';
+
+    const tdAcc   = document.createElement('td');
+    tdAcc.textContent = fmt(r.acc);
+    tdAcc.className   = 'acc-cell ' + accClass(r.acc);
+
+    const tdDivPct = document.createElement('td');
+    tdDivPct.textContent = fmt(100 - r.acc);
+    tdDivPct.style.color = (100 - r.acc) > 0 ? 'var(--warn)' : 'var(--muted)';
+
+    tr.append(tdDate, tdTotal, tdOk, tdDiv, tdAcc, tdDivPct);
+    bodyEl.appendChild(tr);
+  });
+}
+
+// ═══════════════════════════════════════════════
+//  MAIN CALC
+// ═══════════════════════════════════════════════
+function calcular() {
+  const raw    = $('entrada').value.trim();
+  const errBox = $('errorBox');
+  errBox.style.display   = 'none';
+  $('resultado').style.display = 'none';
+
+  if (!raw) {
+    errBox.textContent = '⚠ Nenhum dado colado. Cole a tabela e tente novamente.';
+    errBox.style.display = 'block'; return;
+  }
+
+  const lines = raw.split(/\r?\n/).filter(l => l.trim());
+  if (lines.length < 2) {
+    errBox.textContent = '⚠ A tabela precisa ter pelo menos uma linha de dados.';
+    errBox.style.display = 'block'; return;
+  }
+
+  const sep     = detectSep(lines[0]);
+  const allRows = lines.map(l => l.split(sep).map(c => c.trim()));
+
+  let headers, dataRows;
+  if (isHeaderRow(allRows[0])) {
+    headers  = allRows[0];
+    dataRows = allRows.slice(1).filter(r => r.some(c => c !== ''));
+  } else {
+    headers  = null;
+    dataRows = allRows.filter(r => r.some(c => c !== ''));
+  }
+
+  let idxSis = -1, idxFis = -1, idxStatus = -1;
+  if (headers) {
+    idxSis    = findCol(headers, 'qntd sistema', 'qtd sistema', 'quantidade sistema', 'sistema');
+    idxFis    = findCol(headers, 'qntd fisico', 'qntd físico', 'qtd fisico', 'quantidade fisico',
+                                 'quantidade física', 'fisico', 'físico', 'contado', 'contagem');
+    idxStatus = findCol(headers, 'status');
+  }
+  if (idxSis < 0) idxSis = 3;
+  if (idxFis < 0) idxFis = 4;
+
+  const useStatusCol = idxStatus >= 0;
+  let ok = 0, div = 0, divRows = [];
+
+  dataRows.forEach(row => {
+    let isOk;
+    if (useStatusCol) {
+      isOk = norm(row[idxStatus] || '') === 'ok';
+    } else {
+      const sis = toNumber(row[idxSis]);
+      const fis = toNumber(row[idxFis]);
+      isOk = !isNaN(sis) && !isNaN(fis) && sis === fis;
+    }
+    if (isOk) ok++;
+    else { div++; divRows.push(row); }
+  });
+
+  const total = ok + div;
+  if (total === 0) {
+    errBox.textContent = '⚠ Nenhuma linha de dados encontrada. Verifique o formato.';
+    errBox.style.display = 'block'; return;
+  }
+
+  const acc    = (ok / total) * 100;
+  const divPct = 100 - acc;
+
+  // ── Update result UI ──
+  $('cTotal').textContent  = total;
+  $('cOk').textContent     = ok;
+  $('cOkPct').textContent  = fmt(acc);
+  $('cDiv').textContent    = div;
+  $('cDivPct').textContent = fmt(divPct);
+  $('cAcc').textContent    = fmt(acc);
+  $('barPct').textContent  = fmt(acc);
+  $('barFill').style.width = '0%';
+  setTimeout(() => { $('barFill').style.width = acc + '%'; }, 50);
+
+  // ── Divergent rows table ──
+  const tHead = $('tHead'), tBody = $('tBody');
+  tHead.innerHTML = tBody.innerHTML = '';
+  const cols = headers ? [...headers] : dataRows[0].map((_,i) => 'Col '+(i+1));
+  const showStatusCol = !useStatusCol;
+
+  const htr = document.createElement('tr');
+  cols.forEach(h => { const th = document.createElement('th'); th.textContent = h; htr.appendChild(th); });
+  if (showStatusCol) { const th = document.createElement('th'); th.textContent = 'Status'; htr.appendChild(th); }
+  tHead.appendChild(htr);
+
+  if (divRows.length === 0) {
+    const etr = document.createElement('tr');
+    const etd = document.createElement('td');
+    etd.colSpan = cols.length + (showStatusCol ? 1 : 0);
+    etd.style.cssText = 'color:var(--ok);padding:1rem';
+    etd.textContent = '✅ Nenhuma divergência encontrada!';
+    etr.appendChild(etd); tBody.appendChild(etr);
+  } else {
+    divRows.forEach(row => {
+      const tr = document.createElement('tr');
+      row.forEach((cell, i) => {
+        const td = document.createElement('td');
+        td.textContent = cell;
+        if (useStatusCol && i === idxStatus) td.className = 'status-div';
+        if (!useStatusCol && (i === idxSis || i === idxFis)) { td.style.fontWeight = '600'; td.style.color = 'var(--warn)'; }
+        tr.appendChild(td);
+      });
+      if (showStatusCol) {
+        const td = document.createElement('td');
+        td.textContent = '⚠ Divergente'; td.className = 'status-div';
+        tr.appendChild(td);
+      }
+      tBody.appendChild(tr);
+    });
+  }
+
+  $('resultado').style.display = 'block';
+  $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // ── Save to history ──
+  addRecord({ date: todayStr(), total, ok, div, acc });
+  renderHistory();
+  showToast('✅ Salvo no histórico — ' + todayStr());
+}
+
+// ═══════════════════════════════════════════════
+//  EVENT LISTENERS
+// ═══════════════════════════════════════════════
+$('btnCalc').addEventListener('click', calcular);
+
+$('btnClear').addEventListener('click', () => {
+  $('entrada').value = '';
+  $('resultado').style.display = 'none';
+  $('errorBox').style.display  = 'none';
+});
+
+$('entrada').addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) calcular(); });
+
+// Clear history — modal flow
+$('btnLimparHist').addEventListener('click', () => {
+  $('modalOverlay').classList.add('open');
+});
+$('modalCancel').addEventListener('click', () => {
+  $('modalOverlay').classList.remove('open');
+});
+$('modalConfirm').addEventListener('click', () => {
+  clearHistory();
+  $('modalOverlay').classList.remove('open');
+  renderHistory();
+  showToast('🗑 Histórico apagado.');
+});
+$('modalOverlay').addEventListener('click', e => {
+  if (e.target === $('modalOverlay')) $('modalOverlay').classList.remove('open');
+});
+
+// ── Init ──
+renderHistory();
+</script>
+</body>
+</html>
