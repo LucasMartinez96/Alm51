@@ -27,71 +27,61 @@
     display: flex; flex-direction: column; align-items: center;
     padding: 2.5rem 1rem 5rem;
   }
-
-  /* ── Layout wrapper ── */
   .wrap { width: 100%; max-width: 860px; }
 
-  /* ── Header ── */
+  /* Header */
   header { margin-bottom: 2rem; }
-  .eyebrow {
-    font-family: var(--mono); font-size: 0.7rem;
-    letter-spacing: 0.14em; color: var(--accent);
-    text-transform: uppercase; margin-bottom: 0.5rem;
-  }
+  .eyebrow { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem; }
   h1 { font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
   h1 span { color: var(--muted); font-weight: 300; }
   .subtitle { margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
 
-  /* ── Paste area ── */
-  label.paste-label {
-    display: block; font-family: var(--mono);
-    font-size: 0.7rem; letter-spacing: 0.1em;
-    color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem;
-  }
-  textarea {
-    width: 100%; height: 200px;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 6px; color: var(--text);
-    font-family: var(--mono); font-size: 0.78rem;
-    line-height: 1.5; padding: 1rem; resize: vertical;
-    transition: border-color 0.2s; outline: none;
-  }
+  /* Input */
+  label.paste-label { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
+  textarea { width: 100%; height: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.78rem; line-height: 1.5; padding: 1rem; resize: vertical; transition: border-color 0.2s; outline: none; }
   textarea:focus { border-color: var(--accent); }
   textarea::placeholder { color: var(--muted); opacity: 0.6; }
 
-  /* ── Buttons ── */
+  /* Buttons */
   .btn-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; align-items: center; }
-  button {
-    font-family: var(--sans); font-size: 0.85rem; font-weight: 600;
-    padding: 0.55rem 1.4rem; border-radius: 5px;
-    border: none; cursor: pointer;
-    transition: opacity 0.15s, transform 0.1s;
-  }
+  button { font-family: var(--sans); font-size: 0.85rem; font-weight: 600; padding: 0.55rem 1.4rem; border-radius: 5px; border: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
   button:active { transform: scale(0.97); }
-  .btn-primary  { background: var(--accent); color: #fff; }
-  .btn-ghost    { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--muted); }
   .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
-  .btn-danger   { background: transparent; border: 1px solid #7f1d1d; color: #fca5a5; font-size: 0.78rem; padding: 0.4rem 1rem; }
+  .btn-danger  { background: transparent; border: 1px solid #7f1d1d; color: #fca5a5; font-size: 0.78rem; padding: 0.4rem 1rem; }
   .btn-danger:hover { background: #2a1515; }
 
-  .info-badge {
-    margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted);
-    font-family: var(--mono); background: var(--surface);
-    border: 1px solid var(--border); border-radius: 5px;
-    padding: 0.5rem 0.9rem; display: inline-block;
-  }
+  .info-badge { margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted); font-family: var(--mono); background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 0.5rem 0.9rem; display: inline-block; }
   .info-badge b { color: var(--accent); }
 
-  /* ── Section divider ── */
-  .section { margin-top: 2rem; }
-  .section-header {
-    font-family: var(--mono); font-size: 0.7rem;
-    letter-spacing: 0.12em; color: var(--muted);
-    text-transform: uppercase; margin-bottom: 0.75rem;
-    display: flex; align-items: center; justify-content: space-between;
+  /* Date selector */
+  .date-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.9rem; flex-wrap: wrap; }
+  .date-row label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
+  .date-row input[type="date"] {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text);
+    font-family: var(--mono); font-size: 0.82rem;
+    padding: 0.4rem 0.75rem; outline: none;
+    transition: border-color 0.2s; cursor: pointer;
+    color-scheme: dark;
   }
+  .date-row input[type="date"]:focus { border-color: var(--accent); }
+  .date-tag {
+    font-family: var(--mono); font-size: 0.72rem;
+    padding: 0.25rem 0.6rem; border-radius: 4px;
+    background: rgba(79,142,247,0.12);
+    border: 1px solid rgba(79,142,247,0.25);
+    color: var(--accent); white-space: nowrap;
+  }
+  .date-tag.is-today { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: var(--ok); }
+  .date-tag.is-past  { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: var(--warn); }
 
-  /* ── Result cards ── */
+  /* Section */
+  .section { margin-top: 2rem; }
+  .section-header { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+
+  /* Result cards */
   .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.2rem; }
   .card-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
@@ -102,19 +92,15 @@
   .card-value.neutral { color: var(--text); }
   .card-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
 
-  /* ── Progress bar ── */
-  .bar-section {
-    margin-top: 1.25rem;
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 1.1rem 1.4rem;
-  }
+  /* Bar */
+  .bar-section { margin-top: 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; }
   .bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.6rem; }
   .bar-label .name { color: var(--muted); }
   .bar-label .pct  { font-family: var(--mono); font-weight: 600; }
   .bar-track { width: 100%; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
   .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(.22,1,.36,1); background: linear-gradient(90deg, var(--ok), var(--accent)); }
 
-  /* ── Divergent detail ── */
+  /* Divergent detail */
   details { margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   summary { padding: 0.8rem 1.2rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
   summary::-webkit-details-marker { display: none; }
@@ -128,104 +114,63 @@
   td.status-ok  { color: var(--ok); }
   td.status-div { color: var(--warn); font-weight: 600; }
 
-  /* ── History section ── */
+  /* History */
   #secHistorico { margin-top: 3rem; }
-
-  .hist-summary-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-  }
-  .hist-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 1rem 1.2rem;
-  }
+  .hist-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
+  .hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; }
   .hist-card-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
   .hist-card-value { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; }
   .hist-card-value.acc { color: var(--accent); }
   .hist-card-sub  { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
 
-  /* sparkline mini-bars */
-  .spark { display: flex; align-items: flex-end; gap: 3px; height: 32px; margin-top: 0.5rem; }
-  .spark-bar {
-    flex: 1; border-radius: 2px 2px 0 0;
-    background: var(--accent); opacity: 0.5;
-    min-height: 3px;
-    transition: opacity 0.2s;
-    cursor: default;
-    position: relative;
-  }
+  /* Sparkline */
+  .spark { display: flex; align-items: flex-end; gap: 3px; height: 36px; margin-top: 0.4rem; }
+  .spark-bar { flex: 1; border-radius: 2px 2px 0 0; background: var(--accent); opacity: 0.45; min-height: 3px; cursor: default; position: relative; transition: opacity 0.2s; }
   .spark-bar:hover { opacity: 1; }
   .spark-bar[data-today="1"] { opacity: 1; background: var(--ok); }
+  .spark-tooltip { position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #1e2535; border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; font-size: 0.65rem; font-family: var(--mono); color: var(--text); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
+  .spark-bar:hover .spark-tooltip { opacity: 1; }
 
-  /* history table */
-  .hist-table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
+  /* History table */
+  .hist-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
   .hist-table-wrap table { width: 100%; }
-  .hist-table-wrap thead th {
-    background: var(--bg);
-    padding: 0.6rem 1rem;
-    font-size: 0.65rem;
-  }
-  .hist-table-wrap tbody td { padding: 0.55rem 1rem; font-size: 0.8rem; }
+  .hist-table-wrap thead th { background: var(--bg); padding: 0.6rem 1rem; font-size: 0.65rem; }
+  .hist-table-wrap tbody td { padding: 0.6rem 1rem; font-size: 0.8rem; }
   .hist-table-wrap tbody tr:last-child td { border-bottom: none; }
   td.acc-cell { font-family: var(--mono); font-weight: 600; }
   td.acc-high { color: var(--ok); }
   td.acc-mid  { color: var(--warn); }
   td.acc-low  { color: var(--danger); }
-  .today-badge {
-    display: inline-block;
-    font-size: 0.6rem; font-family: var(--mono);
-    background: rgba(79,142,247,0.15);
-    border: 1px solid rgba(79,142,247,0.3);
-    color: var(--accent);
-    border-radius: 3px; padding: 1px 5px; margin-left: 6px;
-    vertical-align: middle; text-transform: uppercase; letter-spacing: 0.05em;
-  }
+  .today-badge { display: inline-block; font-size: 0.6rem; font-family: var(--mono); background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.3); color: var(--accent); border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.05em; }
+  .trend { font-size: 0.75rem; margin-left: 4px; }
+  .trend.up   { color: var(--ok); }
+  .trend.down { color: var(--danger); }
+  .trend.flat { color: var(--muted); }
 
-  /* empty state */
-  .hist-empty {
-    padding: 2.5rem 1.5rem; text-align: center;
-    color: var(--muted); font-size: 0.85rem;
-  }
+  /* Empty state */
+  .hist-empty { padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; line-height: 1.7; }
   .hist-empty span { display: block; font-size: 1.6rem; margin-bottom: 0.5rem; }
 
-  /* ── Error box ── */
+  /* Error */
   .error-box { display: none; margin-top: 1rem; background: #2a1515; border: 1px solid #7f1d1d; border-radius: 6px; padding: 0.9rem 1.2rem; font-size: 0.82rem; color: #fca5a5; font-family: var(--mono); }
 
-  /* ── Toast notification ── */
-  #toast {
-    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: #1e2535; border: 1px solid var(--border);
-    border-radius: 6px; padding: 0.6rem 1.2rem;
-    font-size: 0.8rem; font-family: var(--mono);
-    color: var(--text); box-shadow: 0 4px 24px rgba(0,0,0,0.4);
-    transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s;
-    opacity: 0; z-index: 999; white-space: nowrap;
-  }
+  /* Toast */
+  #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1e2535; border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 1.2rem; font-size: 0.8rem; font-family: var(--mono); color: var(--text); box-shadow: 0 4px 24px rgba(0,0,0,0.4); transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s; opacity: 0; z-index: 999; white-space: nowrap; }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-  /* ── Modal confirm ── */
-  .modal-overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.7); z-index: 100;
-    align-items: center; justify-content: center;
-  }
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.open { display: flex; }
-  .modal {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 10px; padding: 2rem; max-width: 380px; width: 90%;
-  }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; max-width: 380px; width: 90%; }
   .modal h3 { font-size: 1rem; margin-bottom: 0.5rem; }
   .modal p  { font-size: 0.83rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
   .modal .modal-btns { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+  /* Storage status */
+  .storage-badge { font-size: 0.68rem; font-family: var(--mono); color: var(--muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
+  .storage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); display: inline-block; }
+  .storage-dot.ok { background: var(--ok); }
+  .storage-dot.warn { background: var(--warn); }
 
   @media (max-width: 500px) {
     h1 { font-size: 1.25rem; }
@@ -234,16 +179,15 @@
 </style>
 </head>
 <body>
-
 <div class="wrap">
 
 <header>
   <p class="eyebrow">Ferramenta de Inventário</p>
   <h1>Calculadora de Acuracidade <span>/ Estoque</span></h1>
-  <p class="subtitle">Cole a tabela copiada do Excel. Status calculado automaticamente: Qtd Sistema × Qtd Físico.</p>
+  <p class="subtitle">Cole a tabela do Excel. Status calculado automaticamente: Qtd Sistema × Qtd Físico.</p>
 </header>
 
-<!-- ── Input ── -->
+<!-- Input -->
 <label class="paste-label" for="entrada">▸ Cole a tabela aqui</label>
 <textarea id="entrada" placeholder="Item	Subinventory	Locator	Qntd Sistema	Qntd Fisico	Item Description
 M000000537	71MG51ALM	10C-12F	2	2	BROCA DIA.21MM
@@ -254,16 +198,28 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
   <button class="btn-primary" id="btnCalc">▶ Calcular</button>
   <button class="btn-ghost"   id="btnClear">Limpar</button>
 </div>
-<div class="info-badge">
+
+<!-- Date selector -->
+<div class="date-row">
+  <label for="inputData">📅 Data do inventário:</label>
+  <input type="date" id="inputData" />
+  <span class="date-tag" id="dateTag">hoje</span>
+</div>
+
+<div class="info-badge" style="margin-top:0.6rem">
   Regra: <b>OK</b> quando Qntd Sistema = Qntd Físico &nbsp;|&nbsp; <b>Divergente</b> quando diferente
+</div>
+<div class="storage-badge" id="storageBadge">
+  <span class="storage-dot" id="storageDot"></span>
+  <span id="storageLabel">verificando armazenamento…</span>
 </div>
 
 <div class="error-box" id="errorBox"></div>
 
-<!-- ── Result ── -->
+<!-- Result -->
 <div id="resultado" style="display:none">
   <div class="section">
-    <div class="section-header"><span>▸ Resultado de hoje</span></div>
+    <div class="section-header"><span>▸ Resultado — <span id="resultDateLabel">hoje</span></span></div>
     <div class="cards">
       <div class="card">
         <div class="card-label">Total de Itens</div>
@@ -302,14 +258,13 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
   </div>
 </div>
 
-<!-- ── History ── -->
+<!-- History -->
 <div id="secHistorico">
-  <div class="section-header">
+  <div class="section-header" style="margin-top:3rem">
     <span>▸ Histórico de Acuracidade</span>
     <button class="btn-danger" id="btnLimparHist">🗑 Limpar histórico</button>
   </div>
 
-  <!-- summary cards -->
   <div class="hist-summary-cards" id="histSummaryCards" style="display:none">
     <div class="hist-card">
       <div class="hist-card-label">Acuracidade Média Geral</div>
@@ -332,7 +287,6 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
     </div>
   </div>
 
-  <!-- history table -->
   <div class="hist-table-wrap" id="histTableWrap">
     <div class="hist-empty" id="histEmpty">
       <span>📋</span>
@@ -347,6 +301,7 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
           <th>Divergentes ⚠️</th>
           <th>Acuracidade</th>
           <th>Divergência</th>
+          <th>Tendência</th>
         </tr>
       </thead>
       <tbody id="histBody"></tbody>
@@ -356,42 +311,149 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
 
 </div><!-- /wrap -->
 
-<!-- ── Toast ── -->
 <div id="toast"></div>
 
-<!-- ── Modal ── -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h3>Limpar histórico?</h3>
     <p>Todos os registros salvos serão apagados permanentemente. Essa ação não pode ser desfeita.</p>
     <div class="modal-btns">
-      <button class="btn-ghost" id="modalCancel">Cancelar</button>
-      <button class="btn-danger" id="modalConfirm" style="font-size:0.85rem;padding:0.55rem 1.2rem">Sim, apagar tudo</button>
+      <button class="btn-ghost"   id="modalCancel">Cancelar</button>
+      <button class="btn-danger"  id="modalConfirm" style="font-size:0.85rem;padding:0.55rem 1.2rem">Sim, apagar tudo</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  STORAGE ABSTRACTION
+//  Tries window.storage (Claude artifacts) → localStorage → in-memory
+// ═══════════════════════════════════════════════════════
+const STORE_KEY = 'inv_hist_v2';
+let _memStore  = {};   // fallback when nothing else works
+let _storeMode = 'checking';
+
+async function storeGet() {
+  // 1. Try Claude artifact storage
+  if (window.storage) {
+    try {
+      const r = await window.storage.get(STORE_KEY);
+      return r ? JSON.parse(r.value) : {};
+    } catch(e) { /* key not found = empty */ return {}; }
+  }
+  // 2. Try localStorage
+  try {
+    return JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+  } catch(e) {}
+  // 3. In-memory
+  return { ..._memStore };
+}
+
+async function storeSet(data) {
+  const payload = JSON.stringify(data);
+  // 1. Claude artifact storage
+  if (window.storage) {
+    try {
+      await window.storage.set(STORE_KEY, payload);
+      return 'artifact';
+    } catch(e) {}
+  }
+  // 2. localStorage
+  try {
+    localStorage.setItem(STORE_KEY, payload);
+    return 'local';
+  } catch(e) {}
+  // 3. In-memory
+  _memStore = data;
+  return 'memory';
+}
+
+async function storeDel() {
+  if (window.storage) {
+    try { await window.storage.delete(STORE_KEY); } catch(e) {}
+  }
+  try { localStorage.removeItem(STORE_KEY); } catch(e) {}
+  _memStore = {};
+}
+
+async function detectStorageMode() {
+  const dot   = document.getElementById('storageDot');
+  const label = document.getElementById('storageLabel');
+  if (window.storage) {
+    dot.className   = 'storage-dot ok';
+    label.textContent = 'histórico persistente ativo (Claude Storage)';
+    return;
+  }
+  try {
+    localStorage.setItem('__test__', '1');
+    localStorage.removeItem('__test__');
+    dot.className   = 'storage-dot ok';
+    label.textContent = 'histórico persistente ativo (localStorage)';
+    return;
+  } catch(e) {}
+  dot.className   = 'storage-dot warn';
+  label.textContent = 'modo memória — histórico resetará ao fechar a página';
+}
+
+// ═══════════════════════════════════════════════════════
 //  UTILITIES
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 const $ = id => document.getElementById(id);
 
-function norm(s) {
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
-}
-function toNumber(s) {
-  return parseFloat((s || '').replace(',', '.').trim());
-}
-function fmt(n) {
-  return n.toFixed(2).replace('.', ',') + '%';
-}
+function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function toNumber(s) { return parseFloat((s || '').replace(',','.').trim()); }
+function fmt(n)   { return n.toFixed(2).replace('.',',') + '%'; }
+
 function todayStr() {
   const d = new Date();
   return String(d.getDate()).padStart(2,'0') + '/' +
-         String(d.getMonth()+1).padStart(2,'0') + '/' +
-         d.getFullYear();
+         String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
 }
+
+// Convert DD/MM/YYYY ↔ YYYY-MM-DD (input[type=date] value)
+function ddmmToISO(s) {
+  const [d,m,y] = s.split('/');
+  return `${y}-${m}-${d}`;
+}
+function isoToDDMM(s) {
+  if (!s) return '';
+  const [y,m,d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
+function parseDate(s) {
+  const [d,m,y] = s.split('/');
+  return new Date(+y, +m-1, +d);
+}
+
+// Returns the currently selected date as DD/MM/YYYY
+function selectedDateStr() {
+  const v = $('inputData').value;   // YYYY-MM-DD or ''
+  return v ? isoToDDMM(v) : todayStr();
+}
+
+// Update the date tag badge next to the date input
+function updateDateTag() {
+  const sel   = selectedDateStr();
+  const today = todayStr();
+  const tag   = $('dateTag');
+  const diff  = Math.round((parseDate(today) - parseDate(sel)) / 86400000);
+
+  if (diff === 0) {
+    tag.textContent = 'hoje';
+    tag.className   = 'date-tag is-today';
+  } else if (diff === 1) {
+    tag.textContent = 'ontem';
+    tag.className   = 'date-tag is-past';
+  } else if (diff > 1) {
+    tag.textContent = `há ${diff} dias`;
+    tag.className   = 'date-tag is-past';
+  } else {
+    tag.textContent = 'data futura';
+    tag.className   = 'date-tag';
+  }
+}
+
 function showToast(msg) {
   const t = $('toast');
   t.textContent = msg;
@@ -399,6 +461,7 @@ function showToast(msg) {
   clearTimeout(t._tid);
   t._tid = setTimeout(() => t.classList.remove('show'), 2800);
 }
+
 function detectSep(line) {
   const tabs  = (line.match(/\t/g)  || []).length;
   const commas= (line.match(/,/g)   || []).length;
@@ -407,66 +470,41 @@ function detectSep(line) {
   if (semis > commas) return ';';
   return ',';
 }
+
 function isHeaderRow(row) {
   const j = row.join(' ').toLowerCase();
-  return j.includes('item') || j.includes('status') ||
-         j.includes('subinventory') || j.includes('locator') ||
-         j.includes('qntd') || j.includes('quantidade') ||
+  return j.includes('item') || j.includes('status') || j.includes('subinventory') ||
+         j.includes('locator') || j.includes('qntd') || j.includes('quantidade') ||
          j.includes('description') || j.includes('descrição');
 }
+
 function findCol(headers, ...candidates) {
   for (const h of headers) {
     const n = norm(h);
-    for (const c of candidates) {
-      if (n.includes(norm(c))) return headers.indexOf(h);
-    }
+    for (const c of candidates) { if (n.includes(norm(c))) return headers.indexOf(h); }
   }
   return -1;
 }
+
 function accClass(v) {
-  if (v >= 99)   return 'acc-high';
-  if (v >= 95)   return 'acc-mid';
+  if (v >= 99) return 'acc-high';
+  if (v >= 95) return 'acc-mid';
   return 'acc-low';
 }
 
-// ═══════════════════════════════════════════════
-//  STORAGE
-// ═══════════════════════════════════════════════
-const STORAGE_KEY = 'inv_acuracidade_hist_v1';
-
-function loadHistory() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-  } catch(e) { return {}; }
-}
-function saveHistory(hist) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
-}
-function addRecord(record) {
-  const hist = loadHistory();
-  hist[record.date] = record;   // overwrites same date
-  saveHistory(hist);
-}
-function clearHistory() {
-  localStorage.removeItem(STORAGE_KEY);
-}
-
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  RENDER HISTORY
-// ═══════════════════════════════════════════════
-function renderHistory() {
-  const hist   = loadHistory();
-  const keys   = Object.keys(hist).sort((a, b) => {
-    // sort by date descending (dd/mm/yyyy → comparable)
-    const parse = s => { const [d,m,y] = s.split('/'); return new Date(y,m-1,d); };
-    return parse(b) - parse(a);
-  });
+// ═══════════════════════════════════════════════════════
+async function renderHistory() {
+  const hist     = await storeGet();
+  const today    = todayStr();
+  const selected = selectedDateStr();
+  const keys     = Object.keys(hist).sort((a,b) => parseDate(b) - parseDate(a));
 
   const summaryEl = $('histSummaryCards');
   const tableEl   = $('histTable');
   const emptyEl   = $('histEmpty');
   const bodyEl    = $('histBody');
-  const today     = todayStr();
 
   if (keys.length === 0) {
     summaryEl.style.display = 'none';
@@ -494,55 +532,82 @@ function renderHistory() {
   $('hPior').textContent       = fmt(minV);
   $('hPiorDia').textContent    = minD;
 
-  // ── Sparkline (last 10 days, chronological) ──
-  const sparkKeys = [...keys].reverse().slice(-10);
+  // ── Sparkline (últimos 14 dias, cronológico) ──
+  const sparkKeys = [...keys].reverse().slice(-14);
   const sparkEl   = $('sparkLine');
   sparkEl.innerHTML = '';
-  const sparkMax = Math.max(...sparkKeys.map(k => hist[k].acc), 1);
+  const sparkMax = Math.max(...sparkKeys.map(k => hist[k].acc), 80);
   sparkKeys.forEach(k => {
-    const bar = document.createElement('div');
+    const bar     = document.createElement('div');
     bar.className = 'spark-bar';
-    const pct = (hist[k].acc / sparkMax) * 100;
-    bar.style.height = pct + '%';
+    const pct     = ((hist[k].acc - 80) / (sparkMax - 79)) * 100;
+    bar.style.height = Math.max(pct, 5) + '%';
     if (k === today) bar.dataset.today = '1';
-    bar.title = `${k}: ${fmt(hist[k].acc)}`;
+    const tip = document.createElement('div');
+    tip.className   = 'spark-tooltip';
+    tip.textContent = `${k}: ${fmt(hist[k].acc)}`;
+    bar.appendChild(tip);
     sparkEl.appendChild(bar);
   });
 
   // ── Table rows ──
   bodyEl.innerHTML = '';
-  keys.forEach(k => {
-    const r  = hist[k];
-    const tr = document.createElement('tr');
-    const isToday = k === today;
+  const sortedAsc = [...keys].reverse(); // oldest first, for trend calc
+
+  keys.forEach((k, idx) => {
+    const r          = hist[k];
+    const tr         = document.createElement('tr');
+    const isToday    = k === today;
+    const isSelected = k === selected && selected !== today;
+
+    // Trend vs previous day
+    const posInAsc = sortedAsc.indexOf(k);
+    let trendHTML  = '<span class="trend flat">—</span>';
+    if (posInAsc > 0) {
+      const prevKey = sortedAsc[posInAsc - 1];
+      const delta   = r.acc - hist[prevKey].acc;
+      if (Math.abs(delta) < 0.005) {
+        trendHTML = '<span class="trend flat">→ estável</span>';
+      } else if (delta > 0) {
+        trendHTML = `<span class="trend up">↑ +${fmt(delta)}</span>`;
+      } else {
+        trendHTML = `<span class="trend down">↓ ${fmt(delta)}</span>`;
+      }
+    }
 
     const tdDate = document.createElement('td');
-    tdDate.innerHTML = k + (isToday ? '<span class="today-badge">hoje</span>' : '');
+    let badge = '';
+    if (isToday)    badge += '<span class="today-badge">hoje</span>';
+    if (isSelected) badge += '<span class="today-badge" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--warn)">selecionado</span>';
+    tdDate.innerHTML = k + badge;
 
-    const tdTotal = document.createElement('td'); tdTotal.textContent = r.total;
-    const tdOk    = document.createElement('td'); tdOk.textContent    = r.ok;    tdOk.style.color = 'var(--ok)';
-    const tdDiv   = document.createElement('td'); tdDiv.textContent   = r.div;   tdDiv.style.color = r.div > 0 ? 'var(--warn)' : 'var(--muted)';
+    const tdTotal  = document.createElement('td'); tdTotal.textContent = r.total;
+    const tdOk     = document.createElement('td'); tdOk.textContent    = r.ok;   tdOk.style.color = 'var(--ok)';
+    const tdDiv    = document.createElement('td'); tdDiv.textContent   = r.div;  tdDiv.style.color = r.div > 0 ? 'var(--warn)' : 'var(--muted)';
 
-    const tdAcc   = document.createElement('td');
+    const tdAcc = document.createElement('td');
     tdAcc.textContent = fmt(r.acc);
     tdAcc.className   = 'acc-cell ' + accClass(r.acc);
 
     const tdDivPct = document.createElement('td');
     tdDivPct.textContent = fmt(100 - r.acc);
-    tdDivPct.style.color = (100 - r.acc) > 0 ? 'var(--warn)' : 'var(--muted)';
+    tdDivPct.style.color = (100 - r.acc) > 0.005 ? 'var(--warn)' : 'var(--muted)';
 
-    tr.append(tdDate, tdTotal, tdOk, tdDiv, tdAcc, tdDivPct);
+    const tdTrend = document.createElement('td');
+    tdTrend.innerHTML = trendHTML;
+
+    tr.append(tdDate, tdTotal, tdOk, tdDiv, tdAcc, tdDivPct, tdTrend);
     bodyEl.appendChild(tr);
   });
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  MAIN CALC
-// ═══════════════════════════════════════════════
-function calcular() {
+// ═══════════════════════════════════════════════════════
+async function calcular() {
   const raw    = $('entrada').value.trim();
   const errBox = $('errorBox');
-  errBox.style.display   = 'none';
+  errBox.style.display        = 'none';
   $('resultado').style.display = 'none';
 
   if (!raw) {
@@ -571,8 +636,7 @@ function calcular() {
   let idxSis = -1, idxFis = -1, idxStatus = -1;
   if (headers) {
     idxSis    = findCol(headers, 'qntd sistema', 'qtd sistema', 'quantidade sistema', 'sistema');
-    idxFis    = findCol(headers, 'qntd fisico', 'qntd físico', 'qtd fisico', 'quantidade fisico',
-                                 'quantidade física', 'fisico', 'físico', 'contado', 'contagem');
+    idxFis    = findCol(headers, 'qntd fisico', 'qntd físico', 'qtd fisico', 'quantidade fisico', 'fisico', 'físico', 'contado', 'contagem');
     idxStatus = findCol(headers, 'status');
   }
   if (idxSis < 0) idxSis = 3;
@@ -603,7 +667,7 @@ function calcular() {
   const acc    = (ok / total) * 100;
   const divPct = 100 - acc;
 
-  // ── Update result UI ──
+  // Update result cards
   $('cTotal').textContent  = total;
   $('cOk').textContent     = ok;
   $('cOkPct').textContent  = fmt(acc);
@@ -614,7 +678,7 @@ function calcular() {
   $('barFill').style.width = '0%';
   setTimeout(() => { $('barFill').style.width = acc + '%'; }, 50);
 
-  // ── Divergent rows table ──
+  // Divergent rows table
   const tHead = $('tHead'), tBody = $('tBody');
   tHead.innerHTML = tBody.innerHTML = '';
   const cols = headers ? [...headers] : dataRows[0].map((_,i) => 'Col '+(i+1));
@@ -628,9 +692,9 @@ function calcular() {
   if (divRows.length === 0) {
     const etr = document.createElement('tr');
     const etd = document.createElement('td');
-    etd.colSpan = cols.length + (showStatusCol ? 1 : 0);
+    etd.colSpan   = cols.length + (showStatusCol ? 1 : 0);
     etd.style.cssText = 'color:var(--ok);padding:1rem';
-    etd.textContent = '✅ Nenhuma divergência encontrada!';
+    etd.textContent   = '✅ Nenhuma divergência encontrada!';
     etr.appendChild(etd); tBody.appendChild(etr);
   } else {
     divRows.forEach(row => {
@@ -654,15 +718,28 @@ function calcular() {
   $('resultado').style.display = 'block';
   $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
 
+  // ── Update result header label ──
+  const chosenDate = selectedDateStr();
+  const today      = todayStr();
+  const diff       = Math.round((parseDate(today) - parseDate(chosenDate)) / 86400000);
+  $('resultDateLabel').textContent =
+    diff === 0 ? 'hoje (' + chosenDate + ')' :
+    diff === 1 ? 'ontem (' + chosenDate + ')' :
+    chosenDate;
+
   // ── Save to history ──
-  addRecord({ date: todayStr(), total, ok, div, acc });
-  renderHistory();
-  showToast('✅ Salvo no histórico — ' + todayStr());
+  const hist  = await storeGet();
+  hist[chosenDate] = { date: chosenDate, total, ok, div, acc };
+  const mode  = await storeSet(hist);
+  await renderHistory();
+
+  const modeLabel = mode === 'artifact' ? 'Claude Storage' : mode === 'local' ? 'localStorage' : 'memória';
+  showToast(`✅ Salvo — ${chosenDate} (${modeLabel})`);
 }
 
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 //  EVENT LISTENERS
-// ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
 $('btnCalc').addEventListener('click', calcular);
 
 $('btnClear').addEventListener('click', () => {
@@ -673,24 +750,32 @@ $('btnClear').addEventListener('click', () => {
 
 $('entrada').addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) calcular(); });
 
-// Clear history — modal flow
-$('btnLimparHist').addEventListener('click', () => {
-  $('modalOverlay').classList.add('open');
-});
-$('modalCancel').addEventListener('click', () => {
+$('btnLimparHist').addEventListener('click', () => $('modalOverlay').classList.add('open'));
+$('modalCancel').addEventListener('click',   () => $('modalOverlay').classList.remove('open'));
+$('modalOverlay').addEventListener('click',  e => { if (e.target === $('modalOverlay')) $('modalOverlay').classList.remove('open'); });
+
+$('modalConfirm').addEventListener('click', async () => {
+  await storeDel();
   $('modalOverlay').classList.remove('open');
-});
-$('modalConfirm').addEventListener('click', () => {
-  clearHistory();
-  $('modalOverlay').classList.remove('open');
-  renderHistory();
+  await renderHistory();
   showToast('🗑 Histórico apagado.');
-});
-$('modalOverlay').addEventListener('click', e => {
-  if (e.target === $('modalOverlay')) $('modalOverlay').classList.remove('open');
 });
 
 // ── Init ──
+// Set date picker to today by default
+(function initDate() {
+  const t = new Date();
+  const iso = t.getFullYear() + '-' +
+              String(t.getMonth()+1).padStart(2,'0') + '-' +
+              String(t.getDate()).padStart(2,'0');
+  $('inputData').value = iso;
+  $('inputData').max   = iso;   // can't pick future dates
+  updateDateTag();
+})();
+
+$('inputData').addEventListener('change', updateDateTag);
+
+detectStorageMode();
 renderHistory();
 </script>
 </body>
