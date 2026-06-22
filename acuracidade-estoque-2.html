@@ -3,305 +3,298 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de Acuracidade — Inventário</title>
+<title>Acuracidade de Estoque</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap');
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --bg:      #0f1117;
-    --surface: #181c27;
-    --border:  #252b3b;
-    --accent:  #4f8ef7;
-    --ok:      #22c55e;
-    --warn:    #f59e0b;
-    --danger:  #ef4444;
-    --text:    #e2e8f0;
-    --muted:   #64748b;
-    --mono:    'IBM Plex Mono', monospace;
-    --sans:    'IBM Plex Sans', sans-serif;
-  }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: var(--sans);
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center;
-    padding: 2.5rem 1rem 5rem;
-  }
-  .wrap { width: 100%; max-width: 860px; }
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0e18;--surface:#131825;--surface2:#1a1f30;--border:#1f2638;--border2:#2a3347;
+  --accent:#4f8ef7;--accent2:#3b7de8;--ok:#22c55e;--warn:#f59e0b;--danger:#ef4444;
+  --text:#e2e8f0;--text2:#94a3b8;--muted:#4a5568;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--r2:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2.5rem 1rem 6rem}
+.wrap{width:100%;max-width:900px}
 
-  /* Header */
-  header { margin-bottom: 2rem; }
-  .eyebrow { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; color: var(--accent); text-transform: uppercase; margin-bottom: 0.5rem; }
-  h1 { font-size: 1.6rem; font-weight: 600; line-height: 1.2; }
-  h1 span { color: var(--muted); font-weight: 300; }
-  .subtitle { margin-top: 0.4rem; font-size: 0.85rem; color: var(--muted); }
+/* Header */
+header{margin-bottom:2rem}
+.eyebrow{font-family:var(--mono);font-size:.68rem;letter-spacing:.16em;color:var(--accent);text-transform:uppercase;margin-bottom:.5rem}
+h1{font-size:1.65rem;font-weight:700;line-height:1.2}
+h1 em{color:var(--text2);font-weight:300;font-style:normal}
+.subtitle{margin-top:.35rem;font-size:.84rem;color:var(--text2)}
+.divider{border:none;border-top:1px solid var(--border);margin:2.5rem 0}
 
-  /* Input */
-  label.paste-label { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.5rem; }
-  textarea { width: 100%; height: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: var(--mono); font-size: 0.78rem; line-height: 1.5; padding: 1rem; resize: vertical; transition: border-color 0.2s; outline: none; }
-  textarea:focus { border-color: var(--accent); }
-  textarea::placeholder { color: var(--muted); opacity: 0.6; }
+/* Input */
+.field-label{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;color:var(--text2);text-transform:uppercase;margin-bottom:.5rem;display:block}
+textarea{width:100%;height:185px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:.76rem;line-height:1.55;padding:.9rem 1rem;resize:vertical;outline:none;transition:border-color .2s}
+textarea:focus{border-color:var(--accent)}
+textarea::placeholder{color:var(--muted);opacity:.7}
 
-  /* Buttons */
-  .btn-row { display: flex; gap: 0.75rem; margin-top: 0.75rem; flex-wrap: wrap; align-items: center; }
-  button { font-family: var(--sans); font-size: 0.85rem; font-weight: 600; padding: 0.55rem 1.4rem; border-radius: 5px; border: none; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
-  button:active { transform: scale(0.97); }
-  .btn-primary { background: var(--accent); color: #fff; }
-  .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
-  .btn-danger  { background: transparent; border: 1px solid #7f1d1d; color: #fca5a5; font-size: 0.78rem; padding: 0.4rem 1rem; }
-  .btn-danger:hover { background: #2a1515; }
+/* Controls */
+.controls{display:flex;gap:.75rem;margin-top:.75rem;flex-wrap:wrap;align-items:center}
+.date-wrap{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin-top:.75rem}
+.date-wrap label{font-family:var(--mono);font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+input[type="date"]{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--mono);font-size:.8rem;padding:.38rem .7rem;outline:none;transition:border-color .2s;cursor:pointer;color-scheme:dark}
+input[type="date"]:focus{border-color:var(--accent)}
+.date-tag{font-family:var(--mono);font-size:.68rem;padding:.22rem .55rem;border-radius:4px;white-space:nowrap}
+.date-tag.today{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--ok)}
+.date-tag.past{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--warn)}
+.date-tag.other{background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);color:var(--accent)}
 
-  .info-badge { margin-top: 0.6rem; font-size: 0.75rem; color: var(--muted); font-family: var(--mono); background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 0.5rem 0.9rem; display: inline-block; }
-  .info-badge b { color: var(--accent); }
+/* Buttons */
+button{font-family:var(--sans);font-size:.84rem;font-weight:600;padding:.52rem 1.35rem;border-radius:var(--r);border:none;cursor:pointer;transition:all .15s}
+button:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--text2);color:var(--text)}
+.btn-sm{font-size:.75rem;padding:.35rem .85rem}
+.btn-danger-sm{background:transparent;border:1px solid rgba(239,68,68,.3);color:#fca5a5;font-size:.75rem;padding:.35rem .85rem;font-weight:500}
+.btn-danger-sm:hover{background:rgba(239,68,68,.08)}
 
-  /* Date selector */
-  .date-row { display: flex; align-items: center; gap: 0.75rem; margin-top: 0.9rem; flex-wrap: wrap; }
-  .date-row label { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; white-space: nowrap; }
-  .date-row input[type="date"] {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 5px; color: var(--text);
-    font-family: var(--mono); font-size: 0.82rem;
-    padding: 0.4rem 0.75rem; outline: none;
-    transition: border-color 0.2s; cursor: pointer;
-    color-scheme: dark;
-  }
-  .date-row input[type="date"]:focus { border-color: var(--accent); }
-  .date-tag {
-    font-family: var(--mono); font-size: 0.72rem;
-    padding: 0.25rem 0.6rem; border-radius: 4px;
-    background: rgba(79,142,247,0.12);
-    border: 1px solid rgba(79,142,247,0.25);
-    color: var(--accent); white-space: nowrap;
-  }
-  .date-tag.is-today { background: rgba(34,197,94,0.1); border-color: rgba(34,197,94,0.25); color: var(--ok); }
-  .date-tag.is-past  { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25); color: var(--warn); }
+/* Badges */
+.info-pill{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.7rem;color:var(--text2);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:.4rem .8rem;margin-top:.6rem}
+.info-pill b{color:var(--accent)}
+.store-pill{display:flex;align-items:center;gap:.4rem;font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-top:.4rem}
+.dot{width:6px;height:6px;border-radius:50%}
+.dot.ok{background:var(--ok)}.dot.warn{background:var(--warn)}
 
-  /* Section */
-  .section { margin-top: 2rem; }
-  .section-header { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+/* Error */
+.error-box{display:none;margin-top:.9rem;background:#200e0e;border:1px solid rgba(239,68,68,.35);border-radius:var(--r);padding:.85rem 1.1rem;font-size:.8rem;color:#fca5a5;font-family:var(--mono)}
 
-  /* Result cards */
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; }
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.2rem; }
-  .card-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem; }
-  .card-value { font-family: var(--mono); font-size: 1.7rem; font-weight: 600; line-height: 1; }
-  .card-value.ok      { color: var(--ok); }
-  .card-value.warn    { color: var(--warn); }
-  .card-value.acc     { color: var(--accent); }
-  .card-value.neutral { color: var(--text); }
-  .card-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.3rem; }
+/* Section header */
+.sec-hdr{font-family:var(--mono);font-size:.65rem;letter-spacing:.14em;color:var(--text2);text-transform:uppercase;margin-bottom:.8rem;display:flex;align-items:center;justify-content:space-between}
 
-  /* Bar */
-  .bar-section { margin-top: 1.25rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1.1rem 1.4rem; }
-  .bar-label { display: flex; justify-content: space-between; font-size: 0.78rem; margin-bottom: 0.6rem; }
-  .bar-label .name { color: var(--muted); }
-  .bar-label .pct  { font-family: var(--mono); font-weight: 600; }
-  .bar-track { width: 100%; height: 10px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .bar-fill  { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(.22,1,.36,1); background: linear-gradient(90deg, var(--ok), var(--accent)); }
+/* Result cards */
+.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:.7rem}
+@media(max-width:600px){.cards4{grid-template-columns:repeat(2,1fr)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.1rem}
+.card-lbl{font-size:.68rem;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.3rem}
+.card-val{font-family:var(--mono);font-size:1.75rem;font-weight:600;line-height:1}
+.card-val.c-ok{color:var(--ok)}.card-val.c-warn{color:var(--warn)}
+.card-val.c-acc{color:var(--accent)}.card-val.c-neu{color:var(--text)}
+.card-sub{font-size:.68rem;color:var(--text2);margin-top:.25rem}
 
-  /* Divergent detail */
-  details { margin-top: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  summary { padding: 0.8rem 1.2rem; font-size: 0.8rem; color: var(--muted); cursor: pointer; user-select: none; list-style: none; display: flex; align-items: center; gap: 0.4rem; }
-  summary::-webkit-details-marker { display: none; }
-  summary::before { content: '▶'; font-size: 0.6rem; transition: transform 0.2s; }
-  details[open] summary::before { transform: rotate(90deg); }
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.75rem; font-family: var(--mono); }
-  thead th { background: var(--bg); color: var(--muted); text-align: left; padding: 0.5rem 0.9rem; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.65rem; white-space: nowrap; }
-  tbody tr:hover { background: rgba(255,255,255,0.03); }
-  tbody td { padding: 0.45rem 0.9rem; border-top: 1px solid var(--border); white-space: nowrap; color: var(--text); }
-  td.status-ok  { color: var(--ok); }
-  td.status-div { color: var(--warn); font-weight: 600; }
+/* Progress bar */
+.prog-box{margin-top:1.1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1rem 1.25rem}
+.prog-row{display:flex;justify-content:space-between;font-size:.76rem;margin-bottom:.55rem}
+.prog-row .lbl{color:var(--text2)}.prog-row .val{font-family:var(--mono);font-weight:600}
+.prog-track{height:10px;background:var(--border);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .65s cubic-bezier(.22,1,.36,1)}
 
-  /* History */
-  #secHistorico { margin-top: 3rem; }
-  .hist-summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin-bottom: 1.25rem; }
-  .hist-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; }
-  .hist-card-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
-  .hist-card-value { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; }
-  .hist-card-value.acc { color: var(--accent); }
-  .hist-card-sub  { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+/* Divergent panel */
+.div-panel{margin-top:1rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.div-panel summary{padding:.75rem 1.1rem;font-size:.78rem;color:var(--text2);cursor:pointer;user-select:none;list-style:none;display:flex;align-items:center;gap:.4rem}
+.div-panel summary::-webkit-details-marker{display:none}
+.div-panel summary::before{content:'▶';font-size:.55rem;transition:transform .2s}
+details[open] summary::before{transform:rotate(90deg)}
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:.74rem;font-family:var(--mono)}
+.tbl thead th{background:var(--bg);color:var(--text2);text-align:left;padding:.45rem .9rem;font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:.62rem;white-space:nowrap}
+.tbl tbody tr:hover{background:rgba(255,255,255,.025)}
+.tbl tbody td{padding:.42rem .9rem;border-top:1px solid var(--border);color:var(--text)}
+td.warn-cell{color:var(--warn);font-weight:600}
+td.ok-cell{color:var(--ok)}
+td.desc-cell{max-width:280px;white-space:normal;word-break:break-word;line-height:1.4}
 
-  /* Sparkline */
-  .spark { display: flex; align-items: flex-end; gap: 3px; height: 36px; margin-top: 0.4rem; }
-  .spark-bar { flex: 1; border-radius: 2px 2px 0 0; background: var(--accent); opacity: 0.45; min-height: 3px; cursor: default; position: relative; transition: opacity 0.2s; }
-  .spark-bar:hover { opacity: 1; }
-  .spark-bar[data-today="1"] { opacity: 1; background: var(--ok); }
-  .spark-tooltip { position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: #1e2535; border: 1px solid var(--border); border-radius: 4px; padding: 3px 7px; font-size: 0.65rem; font-family: var(--mono); color: var(--text); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.15s; }
-  .spark-bar:hover .spark-tooltip { opacity: 1; }
+/* History */
+#secHist{margin-top:3rem}
+.hcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:.7rem;margin-bottom:1.2rem}
+.hcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:.95rem 1.1rem}
+.hcard-lbl{font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.28rem}
+.hcard-val{font-family:var(--mono);font-size:1.35rem;font-weight:600}
+.hcard-sub{font-size:.67rem;color:var(--muted);margin-top:.18rem}
 
-  /* History table */
-  .hist-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-  .hist-table-wrap table { width: 100%; }
-  .hist-table-wrap thead th { background: var(--bg); padding: 0.6rem 1rem; font-size: 0.65rem; }
-  .hist-table-wrap tbody td { padding: 0.6rem 1rem; font-size: 0.8rem; }
-  .hist-table-wrap tbody tr:last-child td { border-bottom: none; }
-  td.acc-cell { font-family: var(--mono); font-weight: 600; }
-  td.acc-high { color: var(--ok); }
-  td.acc-mid  { color: var(--warn); }
-  td.acc-low  { color: var(--danger); }
-  .today-badge { display: inline-block; font-size: 0.6rem; font-family: var(--mono); background: rgba(79,142,247,0.15); border: 1px solid rgba(79,142,247,0.3); color: var(--accent); border-radius: 3px; padding: 1px 5px; margin-left: 6px; vertical-align: middle; text-transform: uppercase; letter-spacing: 0.05em; }
-  .trend { font-size: 0.75rem; margin-left: 4px; }
-  .trend.up   { color: var(--ok); }
-  .trend.down { color: var(--danger); }
-  .trend.flat { color: var(--muted); }
+/* Chart */
+.chart-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:1.2rem 1.4rem 1rem;margin-bottom:1.2rem;position:relative}
+.chart-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.chart-title-txt{font-family:var(--mono);font-size:.65rem;color:var(--text2);text-transform:uppercase;letter-spacing:.1em}
+.chart-legend{display:flex;gap:1rem;flex-wrap:wrap}
+.leg{display:flex;align-items:center;gap:.3rem;font-size:.65rem;color:var(--text2)}
+.leg-dot{width:8px;height:8px;border-radius:50%}
+.leg-line{width:16px;height:2.5px;border-radius:2px}
+canvas{display:block;width:100%!important}
+#chartTooltip{position:absolute;pointer-events:none;background:#1a2030;border:1px solid var(--border2);border-radius:6px;padding:.5rem .75rem;font-family:var(--mono);font-size:.7rem;color:var(--text);opacity:0;transition:opacity .15s;z-index:10;white-space:nowrap}
+#chartTooltip .tt-date{color:var(--accent);margin-bottom:.3rem;font-weight:600}
+#chartTooltip .tt-row{display:flex;gap:.5rem;align-items:center;margin-top:.15rem}
+#chartTooltip .tt-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
-  /* Empty state */
-  .hist-empty { padding: 2.5rem 1.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; line-height: 1.7; }
-  .hist-empty span { display: block; font-size: 1.6rem; margin-bottom: 0.5rem; }
+/* History table */
+.htable-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+.htable-wrap table{width:100%}
+.htable-wrap thead th{background:var(--bg);padding:.55rem 1rem;font-size:.62rem;color:var(--text2);text-align:left;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.htable-wrap tbody td{padding:.55rem 1rem;font-size:.78rem;border-top:1px solid var(--border)}
+td.acc-h{color:var(--ok);font-family:var(--mono);font-weight:600}
+td.acc-m{color:var(--warn);font-family:var(--mono);font-weight:600}
+td.acc-l{color:var(--danger);font-family:var(--mono);font-weight:600}
+.badge{display:inline-block;font-size:.58rem;font-family:var(--mono);border-radius:3px;padding:1px 5px;vertical-align:middle;margin-left:5px;text-transform:uppercase}
+.badge-today{background:rgba(79,142,247,.12);border:1px solid rgba(79,142,247,.3);color:var(--accent)}
+.trend-up{color:var(--ok);font-size:.73rem}
+.trend-dn{color:var(--danger);font-size:.73rem}
+.trend-eq{color:var(--muted);font-size:.73rem}
 
-  /* Error */
-  .error-box { display: none; margin-top: 1rem; background: #2a1515; border: 1px solid #7f1d1d; border-radius: 6px; padding: 0.9rem 1.2rem; font-size: 0.82rem; color: #fca5a5; font-family: var(--mono); }
+/* Row clickable */
+.hist-row{cursor:pointer;transition:background .15s}
+.hist-row:hover{background:rgba(79,142,247,.06)!important}
+.hist-row.active{background:rgba(79,142,247,.1)!important;outline:1px solid rgba(79,142,247,.25)}
+.view-btn{font-size:.68rem;font-family:var(--mono);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);color:var(--accent);border-radius:4px;padding:.2rem .55rem;cursor:pointer;white-space:nowrap;transition:background .15s}
+.view-btn:hover{background:rgba(79,142,247,.22)}
+.div-count-badge{font-size:.68rem;font-family:var(--mono);padding:.2rem .5rem;border-radius:4px;white-space:nowrap}
+.div-count-badge.has-div{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--warn)}
+.div-count-badge.no-div{background:transparent;border:1px solid var(--border);color:var(--muted)}
 
-  /* Toast */
-  #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(80px); background: #1e2535; border: 1px solid var(--border); border-radius: 6px; padding: 0.6rem 1.2rem; font-size: 0.8rem; font-family: var(--mono); color: var(--text); box-shadow: 0 4px 24px rgba(0,0,0,0.4); transition: transform 0.3s cubic-bezier(.22,1,.36,1), opacity 0.3s; opacity: 0; z-index: 999; white-space: nowrap; }
-  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+/* Empty */
+.empty{padding:3rem 1.5rem;text-align:center;color:var(--text2);font-size:.84rem;line-height:1.7}
+.empty-icon{font-size:1.8rem;display:block;margin-bottom:.5rem}
 
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; align-items: center; justify-content: center; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 2rem; max-width: 380px; width: 90%; }
-  .modal h3 { font-size: 1rem; margin-bottom: 0.5rem; }
-  .modal p  { font-size: 0.83rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
-  .modal .modal-btns { display: flex; gap: 0.75rem; justify-content: flex-end; }
+/* ═══════════════════════════════════════════
+   DAY DETAIL PANEL — slide in from right
+═══════════════════════════════════════════ */
+#dayPanel{
+  position:fixed;top:0;right:0;height:100vh;width:min(560px,100vw);
+  background:var(--surface2);border-left:1px solid var(--border2);
+  box-shadow:-8px 0 40px rgba(0,0,0,.5);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.22,1,.36,1);
+  z-index:200;display:flex;flex-direction:column;overflow:hidden;
+}
+#dayPanel.open{transform:translateX(0)}
+#panelOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:199}
+#panelOverlay.open{display:block}
 
-  /* Storage status */
-  .storage-badge { font-size: 0.68rem; font-family: var(--mono); color: var(--muted); display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
-  .storage-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); display: inline-block; }
-  .storage-dot.ok { background: var(--ok); }
-  .storage-dot.warn { background: var(--warn); }
+.panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.25rem 1.4rem;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.panel-date{font-family:var(--mono);font-size:1rem;font-weight:600;color:var(--text)}
+.panel-close{background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:.8rem;padding:.3rem .75rem;border-radius:var(--r)}
+.panel-close:hover{color:var(--text);border-color:var(--text2)}
 
-  @media (max-width: 500px) {
-    h1 { font-size: 1.25rem; }
-    .card-value { font-size: 1.35rem; }
-  }
+.panel-body{flex:1;overflow-y:auto;padding:1.25rem 1.4rem 2rem}
+
+/* Mini cards inside panel */
+.panel-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:.6rem;margin-bottom:1.1rem}
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.75rem 1rem}
+.pc-lbl{font-size:.62rem;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.2rem}
+.pc-val{font-family:var(--mono);font-size:1.35rem;font-weight:600}
+.pc-val.ok{color:var(--ok)}.pc-val.warn{color:var(--warn)}.pc-val.acc{color:var(--accent)}.pc-val.neu{color:var(--text)}
+
+/* Panel progress */
+.panel-prog{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.85rem 1rem;margin-bottom:1.2rem}
+.panel-prog-row{display:flex;justify-content:space-between;font-size:.74rem;margin-bottom:.45rem}
+.panel-prog-row .lbl{color:var(--text2)}.panel-prog-row .val{font-family:var(--mono);font-weight:600}
+.panel-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden}
+.panel-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ok),var(--accent));transition:width .5s ease}
+
+/* Panel div table */
+.panel-sec-title{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;color:var(--text2);text-transform:uppercase;margin-bottom:.6rem;margin-top:1.2rem}
+.panel-empty-div{padding:1.2rem;text-align:center;color:var(--ok);font-size:.82rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--r)}
+.panel-tbl-wrap{overflow-x:auto;border-radius:var(--r);overflow:hidden;border:1px solid var(--border)}
+.panel-tbl{width:100%;border-collapse:collapse;font-size:.72rem;font-family:var(--mono)}
+.panel-tbl thead th{background:var(--bg);color:var(--text2);text-align:left;padding:.4rem .8rem;font-weight:400;letter-spacing:.05em;text-transform:uppercase;font-size:.59rem;white-space:nowrap}
+.panel-tbl tbody tr:hover{background:rgba(255,255,255,.025)}
+.panel-tbl tbody td{padding:.4rem .8rem;border-top:1px solid var(--border);color:var(--text)}
+.panel-tbl td.w{color:var(--warn);font-weight:600}
+.panel-tbl td.desc{max-width:200px;white-space:normal;word-break:break-word;line-height:1.35;font-size:.68rem}
+
+/* Toast */
+#toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:#1a2232;border:1px solid var(--border2);border-radius:var(--r);padding:.58rem 1.2rem;font-size:.78rem;font-family:var(--mono);color:var(--text);box-shadow:0 6px 28px rgba(0,0,0,.45);transition:transform .3s cubic-bezier(.22,1,.36,1),opacity .3s;opacity:0;z-index:999;white-space:nowrap}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* Confirm modal */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:300;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r2);padding:2rem;max-width:380px;width:90%}
+.modal h3{font-size:.95rem;margin-bottom:.45rem}
+.modal p{font-size:.8rem;color:var(--text2);margin-bottom:1.4rem;line-height:1.55}
+.modal-btns{display:flex;gap:.75rem;justify-content:flex-end}
 </style>
 </head>
 <body>
 <div class="wrap">
 
+<!-- HEADER -->
 <header>
-  <p class="eyebrow">Ferramenta de Inventário</p>
-  <h1>Calculadora de Acuracidade <span>/ Estoque</span></h1>
-  <p class="subtitle">Cole a tabela do Excel. Status calculado automaticamente: Qtd Sistema × Qtd Físico.</p>
+  <p class="eyebrow">Inventário · Ferramenta</p>
+  <h1>Calculadora de Acuracidade <em>/ Estoque</em></h1>
+  <p class="subtitle">Cole a planilha do Excel. Status calculado automaticamente por comparação de quantidades.</p>
 </header>
 
-<!-- Input -->
-<label class="paste-label" for="entrada">▸ Cole a tabela aqui</label>
+<!-- INPUT -->
+<label class="field-label" for="entrada">▸ Dados do inventário</label>
 <textarea id="entrada" placeholder="Item	Subinventory	Locator	Qntd Sistema	Qntd Fisico	Item Description
 M000000537	71MG51ALM	10C-12F	2	2	BROCA DIA.21MM
-M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
-..."></textarea>
+M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL ..."></textarea>
 
-<div class="btn-row">
-  <button class="btn-primary" id="btnCalc">▶ Calcular</button>
+<div class="controls">
+  <button class="btn-primary" id="btnCalc">▶ Calcular e Salvar</button>
   <button class="btn-ghost"   id="btnClear">Limpar</button>
 </div>
-
-<!-- Date selector -->
-<div class="date-row">
+<div class="date-wrap">
   <label for="inputData">📅 Data do inventário:</label>
-  <input type="date" id="inputData" />
-  <span class="date-tag" id="dateTag">hoje</span>
+  <input type="date" id="inputData">
+  <span class="date-tag" id="dateTag"></span>
 </div>
-
-<div class="info-badge" style="margin-top:0.6rem">
-  Regra: <b>OK</b> quando Qntd Sistema = Qntd Físico &nbsp;|&nbsp; <b>Divergente</b> quando diferente
-</div>
-<div class="storage-badge" id="storageBadge">
-  <span class="storage-dot" id="storageDot"></span>
-  <span id="storageLabel">verificando armazenamento…</span>
-</div>
-
+<div class="info-pill">Regra: <b>OK</b> = Qtd Sistema = Qtd Físico &nbsp;|&nbsp; <b>Divergente</b> = valores diferentes</div>
+<div class="store-pill"><span class="dot" id="storeDot"></span><span id="storeLabel">verificando…</span></div>
 <div class="error-box" id="errorBox"></div>
 
-<!-- Result -->
-<div id="resultado" style="display:none">
-  <div class="section">
-    <div class="section-header"><span>▸ Resultado — <span id="resultDateLabel">hoje</span></span></div>
-    <div class="cards">
-      <div class="card">
-        <div class="card-label">Total de Itens</div>
-        <div class="card-value neutral" id="cTotal">—</div>
-      </div>
-      <div class="card">
-        <div class="card-label">Itens OK ✅</div>
-        <div class="card-value ok" id="cOk">—</div>
-        <div class="card-sub" id="cOkPct"></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Itens Divergentes ⚠️</div>
-        <div class="card-value warn" id="cDiv">—</div>
-        <div class="card-sub" id="cDivPct"></div>
-      </div>
-      <div class="card">
-        <div class="card-label">Acuracidade</div>
-        <div class="card-value acc" id="cAcc">—</div>
-      </div>
-    </div>
-
-    <div class="bar-section">
-      <div class="bar-label">
-        <span class="name">Acuracidade do inventário</span>
-        <span class="pct" id="barPct">—</span>
-      </div>
-      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
-    </div>
-
-    <details>
-      <summary>Ver linhas divergentes</summary>
-      <div class="table-wrap">
-        <table><thead id="tHead"></thead><tbody id="tBody"></tbody></table>
-      </div>
-    </details>
+<!-- RESULTADO ATUAL -->
+<div id="divResultado" style="display:none">
+  <hr class="divider">
+  <div class="sec-hdr"><span>▸ Resultado — <span id="resultLabel"></span></span></div>
+  <div class="cards4">
+    <div class="card"><div class="card-lbl">Total</div><div class="card-val c-neu" id="cTotal">—</div></div>
+    <div class="card"><div class="card-lbl">Itens OK ✅</div><div class="card-val c-ok" id="cOk">—</div><div class="card-sub" id="cOkPct"></div></div>
+    <div class="card"><div class="card-lbl">Divergentes ⚠️</div><div class="card-val c-warn" id="cDiv">—</div><div class="card-sub" id="cDivPct"></div></div>
+    <div class="card"><div class="card-lbl">Acuracidade</div><div class="card-val c-acc" id="cAcc">—</div></div>
   </div>
+  <div class="prog-box">
+    <div class="prog-row"><span class="lbl">Acuracidade do inventário</span><span class="val" id="progPct">—</span></div>
+    <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  </div>
+  <details class="div-panel" id="detailsDiv">
+    <summary id="detailsSummary">Ver itens divergentes</summary>
+    <div class="tbl-wrap"><table class="tbl"><thead id="divThead"></thead><tbody id="divTbody"></tbody></table></div>
+  </details>
 </div>
 
-<!-- History -->
-<div id="secHistorico">
-  <div class="section-header" style="margin-top:3rem">
+<!-- HISTÓRICO -->
+<div id="secHist">
+  <hr class="divider">
+  <div class="sec-hdr">
     <span>▸ Histórico de Acuracidade</span>
-    <button class="btn-danger" id="btnLimparHist">🗑 Limpar histórico</button>
+    <button class="btn-danger-sm btn-sm" id="btnClearHist">🗑 Limpar histórico</button>
   </div>
 
-  <div class="hist-summary-cards" id="histSummaryCards" style="display:none">
-    <div class="hist-card">
-      <div class="hist-card-label">Acuracidade Média Geral</div>
-      <div class="hist-card-value acc" id="hMediaGeral">—</div>
-      <div class="hist-card-sub" id="hMediaSub"></div>
-    </div>
-    <div class="hist-card">
-      <div class="hist-card-label">Melhor Dia</div>
-      <div class="hist-card-value" style="color:var(--ok)" id="hMelhor">—</div>
-      <div class="hist-card-sub" id="hMelhorDia"></div>
-    </div>
-    <div class="hist-card">
-      <div class="hist-card-label">Pior Dia</div>
-      <div class="hist-card-value" style="color:var(--warn)" id="hPior">—</div>
-      <div class="hist-card-sub" id="hPiorDia"></div>
-    </div>
-    <div class="hist-card">
-      <div class="hist-card-label">Evolução (últimos dias)</div>
-      <div class="spark" id="sparkLine"></div>
-    </div>
+  <div class="hcards" id="hcards" style="display:none">
+    <div class="hcard"><div class="hcard-lbl">Média Geral</div><div class="hcard-val" id="hMedia" style="color:var(--accent)">—</div><div class="hcard-sub" id="hMediaSub"></div></div>
+    <div class="hcard"><div class="hcard-lbl">Melhor Dia ✅</div><div class="hcard-val" id="hBest" style="color:var(--ok)">—</div><div class="hcard-sub" id="hBestDay"></div></div>
+    <div class="hcard"><div class="hcard-lbl">Pior Dia ⚠️</div><div class="hcard-val" id="hWorst" style="color:var(--warn)">—</div><div class="hcard-sub" id="hWorstDay"></div></div>
+    <div class="hcard"><div class="hcard-lbl">Dias Registrados</div><div class="hcard-val" id="hDays" style="color:var(--text)">—</div><div class="hcard-sub">inventários</div></div>
   </div>
 
-  <div class="hist-table-wrap" id="histTableWrap">
-    <div class="hist-empty" id="histEmpty">
-      <span>📋</span>
-      Nenhum histórico ainda.<br>Calcule ao menos uma vez para começar a registrar.
+  <div class="chart-wrap" id="chartWrap" style="display:none">
+    <div class="chart-hdr">
+      <div class="chart-title-txt">Evolução da Acuracidade</div>
+      <div class="chart-legend">
+        <span class="leg"><span class="leg-line" style="background:var(--accent)"></span>Acuracidade %</span>
+        <span class="leg"><span class="leg-dot" style="background:var(--ok)"></span>OK</span>
+        <span class="leg"><span class="leg-dot" style="background:var(--warn)"></span>Divergentes</span>
+      </div>
     </div>
+    <canvas id="cvs" height="240"></canvas>
+    <div id="chartTooltip"></div>
+  </div>
+
+  <div class="htable-wrap">
+    <div class="empty" id="histEmpty"><span class="empty-icon">📋</span>Nenhum histórico ainda.<br>Calcule ao menos uma vez para começar.</div>
     <table id="histTable" style="display:none">
       <thead>
         <tr>
-          <th>Data</th>
-          <th>Total</th>
-          <th>OK ✅</th>
-          <th>Divergentes ⚠️</th>
-          <th>Acuracidade</th>
-          <th>Divergência</th>
-          <th>Tendência</th>
+          <th>Data</th><th>Total</th><th>OK ✅</th><th>Divergentes</th>
+          <th>Acuracidade</th><th>Divergência</th><th>Tendência</th><th>Detalhes</th>
         </tr>
       </thead>
       <tbody id="histBody"></tbody>
@@ -311,471 +304,537 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL
 
 </div><!-- /wrap -->
 
+<!-- DAY DETAIL PANEL -->
+<div id="panelOverlay"></div>
+<div id="dayPanel">
+  <div class="panel-header">
+    <div>
+      <div style="font-family:var(--mono);font-size:.6rem;color:var(--text2);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.2rem">Detalhes do dia</div>
+      <div class="panel-date" id="panelDate">—</div>
+    </div>
+    <button class="panel-close" id="panelClose">✕ Fechar</button>
+  </div>
+  <div class="panel-body">
+    <div class="panel-cards">
+      <div class="pc"><div class="pc-lbl">Total de Itens</div><div class="pc-val neu" id="pTotal">—</div></div>
+      <div class="pc"><div class="pc-lbl">Acuracidade</div><div class="pc-val acc" id="pAcc">—</div></div>
+      <div class="pc"><div class="pc-lbl">Itens OK ✅</div><div class="pc-val ok" id="pOk">—</div></div>
+      <div class="pc"><div class="pc-lbl">Divergentes ⚠️</div><div class="pc-val warn" id="pDiv">—</div></div>
+    </div>
+    <div class="panel-prog">
+      <div class="panel-prog-row"><span class="lbl">Acuracidade</span><span class="val" id="pProgPct">—</span></div>
+      <div class="panel-track"><div class="panel-fill" id="pProgFill" style="width:0%"></div></div>
+    </div>
+    <div class="panel-sec-title" id="pDivTitle">▸ Itens Divergentes</div>
+    <div id="pDivContent"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
-<div class="modal-overlay" id="modalOverlay">
+<div class="overlay" id="overlay">
   <div class="modal">
     <h3>Limpar histórico?</h3>
-    <p>Todos os registros salvos serão apagados permanentemente. Essa ação não pode ser desfeita.</p>
+    <p>Todos os registros e itens divergentes salvos serão apagados permanentemente.</p>
     <div class="modal-btns">
-      <button class="btn-ghost"   id="modalCancel">Cancelar</button>
-      <button class="btn-danger"  id="modalConfirm" style="font-size:0.85rem;padding:0.55rem 1.2rem">Sim, apagar tudo</button>
+      <button class="btn-ghost btn-sm" id="modalNo">Cancelar</button>
+      <button class="btn-danger-sm" id="modalYes">Sim, apagar tudo</button>
     </div>
   </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  STORAGE ABSTRACTION
-//  Tries window.storage (Claude artifacts) → localStorage → in-memory
-// ═══════════════════════════════════════════════════════
-const STORE_KEY = 'inv_hist_v2';
-let _memStore  = {};   // fallback when nothing else works
-let _storeMode = 'checking';
+// ══════════════════════════════════════════
+//  STORAGE
+// ══════════════════════════════════════════
+const KEY = 'inv_v4';
+let _ls = false;
+let _mem = {};
 
-async function storeGet() {
-  // 1. Try Claude artifact storage
-  if (window.storage) {
-    try {
-      const r = await window.storage.get(STORE_KEY);
-      return r ? JSON.parse(r.value) : {};
-    } catch(e) { /* key not found = empty */ return {}; }
-  }
-  // 2. Try localStorage
-  try {
-    return JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
-  } catch(e) {}
-  // 3. In-memory
-  return { ..._memStore };
+function initStorage() {
+  try { localStorage.setItem('__t','1'); localStorage.removeItem('__t'); _ls=true; } catch(e){}
+  const dot=El('storeDot'), lbl=El('storeLabel');
+  dot.className = _ls ? 'dot ok' : 'dot warn';
+  lbl.textContent = _ls
+    ? 'Histórico persistente ativo (localStorage)'
+    : 'Modo memória — dados perdidos ao fechar a aba';
 }
 
-async function storeSet(data) {
-  const payload = JSON.stringify(data);
-  // 1. Claude artifact storage
-  if (window.storage) {
-    try {
-      await window.storage.set(STORE_KEY, payload);
-      return 'artifact';
-    } catch(e) {}
-  }
-  // 2. localStorage
-  try {
-    localStorage.setItem(STORE_KEY, payload);
-    return 'local';
-  } catch(e) {}
-  // 3. In-memory
-  _memStore = data;
-  return 'memory';
+function load() {
+  if (_ls) { try { return JSON.parse(localStorage.getItem(KEY)||'{}'); } catch(e){ return {}; } }
+  return JSON.parse(JSON.stringify(_mem));
+}
+function save(obj) {
+  const c = JSON.parse(JSON.stringify(obj));
+  if (_ls) { try { localStorage.setItem(KEY, JSON.stringify(c)); return true; } catch(e){ return false; } }
+  _mem = c; return true;
+}
+function clearAll() {
+  if (_ls) { try { localStorage.removeItem(KEY); } catch(e){} }
+  _mem = {};
+}
+function saveDay(date, record) {
+  const h = load();
+  h[date] = JSON.parse(JSON.stringify(record));
+  const ok = save(h);
+  const chk = load();
+  return ok && chk[date] && chk[date].total === record.total;
 }
 
-async function storeDel() {
-  if (window.storage) {
-    try { await window.storage.delete(STORE_KEY); } catch(e) {}
-  }
-  try { localStorage.removeItem(STORE_KEY); } catch(e) {}
-  _memStore = {};
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+const El = id => document.getElementById(id);
+function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
+function toN(s) { return parseFloat((s||'').replace(',','.').trim()); }
+function fmt(n) { return n.toFixed(2).replace('.',',')+'%'; }
+
+function todayISO(){
+  const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function isoToDMY(s){ if(!s)return''; const[y,m,d]=s.split('-'); return`${d}/${m}/${y}`; }
+function parseD(s)  { const[d,m,y]=s.split('/'); return new Date(+y,+m-1,+d); }
+function selDate()  { return isoToDMY(El('inputData').value||todayISO()); }
+
+function updateTag(){
+  const sel=selDate(), tod=isoToDMY(todayISO());
+  const diff=Math.round((parseD(tod)-parseD(sel))/86400000);
+  const tag=El('dateTag');
+  if(diff===0){ tag.textContent='hoje';          tag.className='date-tag today'; }
+  else if(diff===1){ tag.textContent='ontem';    tag.className='date-tag past';  }
+  else if(diff>1){ tag.textContent=`há ${diff} dias`; tag.className='date-tag past'; }
+  else           { tag.textContent='data futura'; tag.className='date-tag other'; }
 }
 
-async function detectStorageMode() {
-  const dot   = document.getElementById('storageDot');
-  const label = document.getElementById('storageLabel');
-  if (window.storage) {
-    dot.className   = 'storage-dot ok';
-    label.textContent = 'histórico persistente ativo (Claude Storage)';
-    return;
-  }
-  try {
-    localStorage.setItem('__test__', '1');
-    localStorage.removeItem('__test__');
-    dot.className   = 'storage-dot ok';
-    label.textContent = 'histórico persistente ativo (localStorage)';
-    return;
-  } catch(e) {}
-  dot.className   = 'storage-dot warn';
-  label.textContent = 'modo memória — histórico resetará ao fechar a página';
+function toast(msg){
+  const t=El('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
-
-// ═══════════════════════════════════════════════════════
-//  UTILITIES
-// ═══════════════════════════════════════════════════════
-const $ = id => document.getElementById(id);
-
-function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim(); }
-function toNumber(s) { return parseFloat((s || '').replace(',','.').trim()); }
-function fmt(n)   { return n.toFixed(2).replace('.',',') + '%'; }
-
-function todayStr() {
-  const d = new Date();
-  return String(d.getDate()).padStart(2,'0') + '/' +
-         String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+function detectSep(l){
+  const t=(l.match(/\t/g)||[]).length,c=(l.match(/,/g)||[]).length,s=(l.match(/;/g)||[]).length;
+  return t>=c&&t>=s?'\t':s>c?';':',';
 }
-
-// Convert DD/MM/YYYY ↔ YYYY-MM-DD (input[type=date] value)
-function ddmmToISO(s) {
-  const [d,m,y] = s.split('/');
-  return `${y}-${m}-${d}`;
+function isHeader(row){
+  const j=row.join(' ').toLowerCase();
+  return j.includes('item')||j.includes('status')||j.includes('subinventory')||j.includes('locator')||
+         j.includes('qntd')||j.includes('quantidade')||j.includes('description')||j.includes('descrição');
 }
-function isoToDDMM(s) {
-  if (!s) return '';
-  const [y,m,d] = s.split('-');
-  return `${d}/${m}/${y}`;
-}
-
-function parseDate(s) {
-  const [d,m,y] = s.split('/');
-  return new Date(+y, +m-1, +d);
-}
-
-// Returns the currently selected date as DD/MM/YYYY
-function selectedDateStr() {
-  const v = $('inputData').value;   // YYYY-MM-DD or ''
-  return v ? isoToDDMM(v) : todayStr();
-}
-
-// Update the date tag badge next to the date input
-function updateDateTag() {
-  const sel   = selectedDateStr();
-  const today = todayStr();
-  const tag   = $('dateTag');
-  const diff  = Math.round((parseDate(today) - parseDate(sel)) / 86400000);
-
-  if (diff === 0) {
-    tag.textContent = 'hoje';
-    tag.className   = 'date-tag is-today';
-  } else if (diff === 1) {
-    tag.textContent = 'ontem';
-    tag.className   = 'date-tag is-past';
-  } else if (diff > 1) {
-    tag.textContent = `há ${diff} dias`;
-    tag.className   = 'date-tag is-past';
-  } else {
-    tag.textContent = 'data futura';
-    tag.className   = 'date-tag';
-  }
-}
-
-function showToast(msg) {
-  const t = $('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(t._tid);
-  t._tid = setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function detectSep(line) {
-  const tabs  = (line.match(/\t/g)  || []).length;
-  const commas= (line.match(/,/g)   || []).length;
-  const semis = (line.match(/;/g)   || []).length;
-  if (tabs >= commas && tabs >= semis) return '\t';
-  if (semis > commas) return ';';
-  return ',';
-}
-
-function isHeaderRow(row) {
-  const j = row.join(' ').toLowerCase();
-  return j.includes('item') || j.includes('status') || j.includes('subinventory') ||
-         j.includes('locator') || j.includes('qntd') || j.includes('quantidade') ||
-         j.includes('description') || j.includes('descrição');
-}
-
-function findCol(headers, ...candidates) {
-  for (const h of headers) {
-    const n = norm(h);
-    for (const c of candidates) { if (n.includes(norm(c))) return headers.indexOf(h); }
-  }
+function findCol(hdrs,...cands){
+  for(const h of hdrs){ const n=norm(h); for(const c of cands){ if(n.includes(norm(c))) return hdrs.indexOf(h); } }
   return -1;
 }
+function accCls(v){ return v>=99?'acc-h':v>=95?'acc-m':'acc-l'; }
 
-function accClass(v) {
-  if (v >= 99) return 'acc-high';
-  if (v >= 95) return 'acc-mid';
-  return 'acc-low';
+// ══════════════════════════════════════════
+//  DAY DETAIL PANEL
+// ══════════════════════════════════════════
+let _activeRow = null;
+
+function openPanel(date) {
+  const hist = load();
+  const r    = hist[date];
+  if (!r) return;
+
+  // Highlight row
+  if (_activeRow) _activeRow.classList.remove('active');
+  const row = document.getElementById('hrow-'+date.replace(/\//g,'-'));
+  if (row) { row.classList.add('active'); _activeRow = row; }
+
+  // Header
+  El('panelDate').textContent = date + (date===isoToDMY(todayISO())?' (hoje)':'');
+
+  // Cards
+  El('pTotal').textContent = r.total;
+  El('pOk').textContent    = r.ok;
+  El('pDiv').textContent   = r.div;
+  El('pAcc').textContent   = fmt(r.acc);
+
+  // Progress
+  El('pProgPct').textContent   = fmt(r.acc);
+  El('pProgFill').style.width  = '0%';
+  setTimeout(()=>{ El('pProgFill').style.width = r.acc+'%'; }, 60);
+
+  // Divergent items
+  const items = r.divItems || [];
+  El('pDivTitle').textContent = items.length > 0
+    ? `▸ Itens Divergentes (${items.length})`
+    : '▸ Itens Divergentes';
+
+  const cont = El('pDivContent');
+  if (items.length === 0) {
+    cont.innerHTML = '<div class="panel-empty-div">✅ Nenhum item divergente neste dia</div>';
+  } else {
+    let rows = items.map((it,i) => `
+      <tr>
+        <td>${i+1}</td>
+        <td>${it.item||'—'}</td>
+        <td>${it.loc||'—'}</td>
+        <td class="w">${it.sis||'—'}</td>
+        <td class="w">${it.fis||'—'}</td>
+        <td class="desc">${it.desc||'—'}</td>
+        <td class="w" style="white-space:nowrap">⚠ Divergente</td>
+      </tr>`).join('');
+    cont.innerHTML = `
+      <div class="panel-tbl-wrap">
+        <table class="panel-tbl">
+          <thead><tr>
+            <th>#</th><th>Item</th><th>Locator</th>
+            <th>Qtd Sistema</th><th>Qtd Físico</th>
+            <th>Descrição</th><th>Status</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  // Open
+  El('dayPanel').classList.add('open');
+  El('panelOverlay').classList.add('open');
 }
 
-// ═══════════════════════════════════════════════════════
-//  RENDER HISTORY
-// ═══════════════════════════════════════════════════════
-async function renderHistory() {
-  const hist     = await storeGet();
-  const today    = todayStr();
-  const selected = selectedDateStr();
-  const keys     = Object.keys(hist).sort((a,b) => parseDate(b) - parseDate(a));
+function closePanel() {
+  El('dayPanel').classList.remove('open');
+  El('panelOverlay').classList.remove('open');
+  if (_activeRow) { _activeRow.classList.remove('active'); _activeRow=null; }
+}
 
-  const summaryEl = $('histSummaryCards');
-  const tableEl   = $('histTable');
-  const emptyEl   = $('histEmpty');
-  const bodyEl    = $('histBody');
+// ══════════════════════════════════════════
+//  CHART
+// ══════════════════════════════════════════
+function drawChart(hist, keys) {
+  const wrap = El('chartWrap');
+  if (keys.length===0){ wrap.style.display='none'; return; }
+  wrap.style.display='block';
 
-  if (keys.length === 0) {
-    summaryEl.style.display = 'none';
-    tableEl.style.display   = 'none';
-    emptyEl.style.display   = 'block';
+  const cvs=El('cvs'), ctx=cvs.getContext('2d');
+  const DPR=window.devicePixelRatio||1;
+  const W=wrap.clientWidth-44, H=240;
+  cvs.width=W*DPR; cvs.height=H*DPR;
+  cvs.style.width=W+'px'; cvs.style.height=H+'px';
+  ctx.scale(DPR,DPR);
+
+  const PAD={top:28,right:24,bottom:44,left:58};
+  const cW=W-PAD.left-PAD.right, cH=H-PAD.top-PAD.bottom;
+  const n=keys.length;
+  const accVals=keys.map(k=>hist[k].acc);
+  const okVals =keys.map(k=>hist[k].ok);
+  const divVals=keys.map(k=>hist[k].div);
+  const labels =keys.map(k=>k.slice(0,5));
+
+  const minAcc=Math.max(0,Math.min(...accVals)-3);
+  const maxAcc=Math.min(100,Math.max(...accVals)+2);
+  const accRng=maxAcc-minAcc||1;
+  const maxCnt=Math.max(...keys.map(k=>hist[k].total),1);
+
+  function accY(v){ return PAD.top+cH-((v-minAcc)/accRng)*cH; }
+  function xOf(i) { return PAD.left+(n===1?cW/2:i*cW/(n-1)); }
+
+  // BG
+  ctx.fillStyle='#131825'; ctx.fillRect(0,0,W,H);
+
+  // Grid
+  ctx.setLineDash([4,5]); ctx.lineWidth=1; ctx.strokeStyle='#1f2638';
+  ctx.font=`10px IBM Plex Mono,monospace`; ctx.textAlign='right';
+  for(let i=0;i<=5;i++){
+    const v=minAcc+(accRng/5)*i, y=accY(v);
+    ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+cW,y); ctx.stroke();
+    ctx.fillStyle='#4a5568'; ctx.fillText(v.toFixed(1).replace('.',',')+' %',PAD.left-6,y+3.5);
+  }
+  ctx.setLineDash([]);
+
+  // Bars
+  const barW=n===1?48:Math.max(6,cW/n*0.55);
+  keys.forEach((k,i)=>{
+    const x=xOf(i), base=PAD.top+cH;
+    const okH=(okVals[i]/maxCnt)*cH*0.38;
+    const dH =(divVals[i]/maxCnt)*cH*0.38;
+    ctx.fillStyle='rgba(34,197,94,0.18)';
+    ctx.fillRect(x-barW/2,base-okH,barW/2-1,okH);
+    ctx.fillStyle='rgba(245,158,11,0.25)';
+    ctx.fillRect(x,base-dH,barW/2-1,dH);
+  });
+
+  // Area
+  if(n>1){
+    ctx.save(); ctx.beginPath();
+    keys.forEach((k,i)=>{ i===0?ctx.moveTo(xOf(i),accY(hist[k].acc)):ctx.lineTo(xOf(i),accY(hist[k].acc)); });
+    ctx.lineTo(xOf(n-1),PAD.top+cH); ctx.lineTo(xOf(0),PAD.top+cH); ctx.closePath();
+    const ag=ctx.createLinearGradient(0,PAD.top,0,PAD.top+cH);
+    ag.addColorStop(0,'rgba(79,142,247,0.18)'); ag.addColorStop(1,'rgba(79,142,247,0)');
+    ctx.fillStyle=ag; ctx.fill(); ctx.restore();
+  }
+
+  // Line
+  if(n>1){
+    const lg=ctx.createLinearGradient(PAD.left,0,PAD.left+cW,0);
+    lg.addColorStop(0,'#22c55e'); lg.addColorStop(1,'#4f8ef7');
+    ctx.strokeStyle=lg; ctx.lineWidth=2.5; ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.beginPath();
+    keys.forEach((k,i)=>{ i===0?ctx.moveTo(xOf(i),accY(hist[k].acc)):ctx.lineTo(xOf(i),accY(hist[k].acc)); });
+    ctx.stroke();
+  }
+
+  // Dots + labels
+  keys.forEach((k,i)=>{
+    const x=xOf(i), y=accY(hist[k].acc);
+    ctx.beginPath(); ctx.arc(x,y,4.5,0,Math.PI*2);
+    ctx.fillStyle='#4f8ef7'; ctx.strokeStyle='#0b0e18'; ctx.lineWidth=2;
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle='#e2e8f0'; ctx.font='bold 9.5px IBM Plex Mono,monospace';
+    ctx.textAlign='center';
+    ctx.fillText(hist[k].acc.toFixed(1).replace('.',',')+' %',x,y-11);
+  });
+
+  // X labels
+  ctx.fillStyle='#4a5568'; ctx.font='10px IBM Plex Mono,monospace'; ctx.textAlign='center';
+  labels.forEach((l,i)=>ctx.fillText(l,xOf(i),PAD.top+cH+16));
+
+  // Axes
+  ctx.strokeStyle='#1f2638'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(PAD.left,PAD.top); ctx.lineTo(PAD.left,PAD.top+cH); ctx.lineTo(PAD.left+cW,PAD.top+cH); ctx.stroke();
+
+  // Tooltip
+  const tt=El('chartTooltip');
+  cvs.onmousemove=e=>{
+    const r2=cvs.getBoundingClientRect();
+    const cx=(e.clientX-r2.left)/r2.width*W;
+    let best=-1, bd=999;
+    keys.forEach((_,i)=>{ const d=Math.abs(cx-xOf(i)); if(d<bd){bd=d;best=i;} });
+    if(best<0||bd>40){ tt.style.opacity=0; return; }
+    const k=keys[best], r=hist[k];
+    tt.innerHTML=`<div class="tt-date">${k}</div>
+      <div class="tt-row"><span class="tt-dot" style="background:var(--accent)"></span>Acuracidade: <b>${fmt(r.acc)}</b></div>
+      <div class="tt-row"><span class="tt-dot" style="background:var(--ok)"></span>OK: ${r.ok}</div>
+      <div class="tt-row"><span class="tt-dot" style="background:var(--warn)"></span>Divergentes: ${r.div}</div>
+      <div class="tt-row"><span class="tt-dot" style="background:var(--muted)"></span>Total: ${r.total}</div>`;
+    let lx=xOf(best)+16, ly=accY(r.acc)-10;
+    if(lx+170>W) lx=xOf(best)-178; if(ly<0) ly=4;
+    tt.style.left=lx+'px'; tt.style.top=ly+'px'; tt.style.opacity=1;
+  };
+  cvs.onmouseleave=()=>{ tt.style.opacity=0; };
+}
+
+// ══════════════════════════════════════════
+//  RENDER HISTORY TABLE
+// ══════════════════════════════════════════
+function renderHistory() {
+  const hist  = load();
+  const today = isoToDMY(todayISO());
+  const keyAsc= Object.keys(hist).sort((a,b)=>parseD(a)-parseD(b));
+  const keyDsc= [...keyAsc].reverse();
+
+  const hcards =El('hcards'), htable=El('histTable');
+  const hempty =El('histEmpty'), hbody=El('histBody');
+
+  if(keyAsc.length===0){
+    hcards.style.display='none'; htable.style.display='none';
+    hempty.style.display='block'; El('chartWrap').style.display='none';
     return;
   }
+  hempty.style.display='none'; hcards.style.display='grid'; htable.style.display='table';
 
-  emptyEl.style.display   = 'none';
-  summaryEl.style.display = 'grid';
-  tableEl.style.display   = 'table';
+  // Summary cards
+  const vals=keyAsc.map(k=>hist[k].acc);
+  const avg =vals.reduce((a,b)=>a+b,0)/vals.length;
+  const maxV=Math.max(...vals), minV=Math.min(...vals);
+  El('hMedia').textContent   =fmt(avg);
+  El('hMediaSub').textContent=keyAsc.length+' dia'+(keyAsc.length>1?'s':'')+' registrado'+(keyAsc.length>1?'s':'');
+  El('hBest').textContent    =fmt(maxV); El('hBestDay').textContent =keyAsc[vals.indexOf(maxV)];
+  El('hWorst').textContent   =fmt(minV); El('hWorstDay').textContent=keyAsc[vals.indexOf(minV)];
+  El('hDays').textContent    =keyAsc.length;
 
-  // ── Summary cards ──
-  const vals = keys.map(k => hist[k].acc);
-  const avg  = vals.reduce((a,b) => a+b, 0) / vals.length;
-  const maxV = Math.max(...vals);
-  const minV = Math.min(...vals);
-  const maxD = keys[vals.indexOf(maxV)];
-  const minD = keys[vals.indexOf(minV)];
+  drawChart(hist, keyAsc);
 
-  $('hMediaGeral').textContent = fmt(avg);
-  $('hMediaSub').textContent   = `${keys.length} dia${keys.length > 1 ? 's' : ''} registrado${keys.length > 1 ? 's' : ''}`;
-  $('hMelhor').textContent     = fmt(maxV);
-  $('hMelhorDia').textContent  = maxD;
-  $('hPior').textContent       = fmt(minV);
-  $('hPiorDia').textContent    = minD;
+  // Table
+  hbody.innerHTML='';
+  keyDsc.forEach(k=>{
+    const r     =hist[k];
+    const posAsc=keyAsc.indexOf(k);
+    const isT   =k===today;
 
-  // ── Sparkline (últimos 14 dias, cronológico) ──
-  const sparkKeys = [...keys].reverse().slice(-14);
-  const sparkEl   = $('sparkLine');
-  sparkEl.innerHTML = '';
-  const sparkMax = Math.max(...sparkKeys.map(k => hist[k].acc), 80);
-  sparkKeys.forEach(k => {
-    const bar     = document.createElement('div');
-    bar.className = 'spark-bar';
-    const pct     = ((hist[k].acc - 80) / (sparkMax - 79)) * 100;
-    bar.style.height = Math.max(pct, 5) + '%';
-    if (k === today) bar.dataset.today = '1';
-    const tip = document.createElement('div');
-    tip.className   = 'spark-tooltip';
-    tip.textContent = `${k}: ${fmt(hist[k].acc)}`;
-    bar.appendChild(tip);
-    sparkEl.appendChild(bar);
-  });
-
-  // ── Table rows ──
-  bodyEl.innerHTML = '';
-  const sortedAsc = [...keys].reverse(); // oldest first, for trend calc
-
-  keys.forEach((k, idx) => {
-    const r          = hist[k];
-    const tr         = document.createElement('tr');
-    const isToday    = k === today;
-    const isSelected = k === selected && selected !== today;
-
-    // Trend vs previous day
-    const posInAsc = sortedAsc.indexOf(k);
-    let trendHTML  = '<span class="trend flat">—</span>';
-    if (posInAsc > 0) {
-      const prevKey = sortedAsc[posInAsc - 1];
-      const delta   = r.acc - hist[prevKey].acc;
-      if (Math.abs(delta) < 0.005) {
-        trendHTML = '<span class="trend flat">→ estável</span>';
-      } else if (delta > 0) {
-        trendHTML = `<span class="trend up">↑ +${fmt(delta)}</span>`;
-      } else {
-        trendHTML = `<span class="trend down">↓ ${fmt(delta)}</span>`;
-      }
+    let tHTML='<span class="trend-eq">—</span>';
+    if(posAsc>0){
+      const d=r.acc-hist[keyAsc[posAsc-1]].acc;
+      if(Math.abs(d)<0.005) tHTML='<span class="trend-eq">→ estável</span>';
+      else if(d>0)           tHTML=`<span class="trend-up">↑ +${fmt(d)}</span>`;
+      else                   tHTML=`<span class="trend-dn">↓ ${fmt(d)}</span>`;
     }
 
-    const tdDate = document.createElement('td');
-    let badge = '';
-    if (isToday)    badge += '<span class="today-badge">hoje</span>';
-    if (isSelected) badge += '<span class="today-badge" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3);color:var(--warn)">selecionado</span>';
-    tdDate.innerHTML = k + badge;
+    const divItems=r.divItems||[];
+    const divBadge=divItems.length>0
+      ? `<span class="div-count-badge has-div">⚠ ${divItems.length} item${divItems.length>1?'s':''}</span>`
+      : `<span class="div-count-badge no-div">✅ nenhum</span>`;
 
-    const tdTotal  = document.createElement('td'); tdTotal.textContent = r.total;
-    const tdOk     = document.createElement('td'); tdOk.textContent    = r.ok;   tdOk.style.color = 'var(--ok)';
-    const tdDiv    = document.createElement('td'); tdDiv.textContent   = r.div;  tdDiv.style.color = r.div > 0 ? 'var(--warn)' : 'var(--muted)';
+    const tr=document.createElement('tr');
+    tr.className='hist-row';
+    tr.id='hrow-'+k.replace(/\//g,'-');
+    tr.onclick=()=>openPanel(k);
 
-    const tdAcc = document.createElement('td');
-    tdAcc.textContent = fmt(r.acc);
-    tdAcc.className   = 'acc-cell ' + accClass(r.acc);
+    const cells=[
+      k+(isT?'<span class="badge badge-today">hoje</span>':''),
+      r.total,
+      `<span style="color:var(--ok)">${r.ok}</span>`,
+      divBadge,
+      `<span class="${accCls(r.acc)}">${fmt(r.acc)}</span>`,
+      `<span style="color:${(100-r.acc)>0.005?'var(--warn)':'var(--muted)'}">${fmt(100-r.acc)}</span>`,
+      tHTML,
+      `<button class="view-btn" onclick="event.stopPropagation();openPanel('${k}')">👁 Ver dia</button>`
+    ];
 
-    const tdDivPct = document.createElement('td');
-    tdDivPct.textContent = fmt(100 - r.acc);
-    tdDivPct.style.color = (100 - r.acc) > 0.005 ? 'var(--warn)' : 'var(--muted)';
-
-    const tdTrend = document.createElement('td');
-    tdTrend.innerHTML = trendHTML;
-
-    tr.append(tdDate, tdTotal, tdOk, tdDiv, tdAcc, tdDivPct, tdTrend);
-    bodyEl.appendChild(tr);
+    cells.forEach(c=>{
+      const td=document.createElement('td');
+      td.innerHTML=c;
+      tr.appendChild(td);
+    });
+    hbody.appendChild(tr);
   });
 }
 
-// ═══════════════════════════════════════════════════════
-//  MAIN CALC
-// ═══════════════════════════════════════════════════════
-async function calcular() {
-  const raw    = $('entrada').value.trim();
-  const errBox = $('errorBox');
-  errBox.style.display        = 'none';
-  $('resultado').style.display = 'none';
+// ══════════════════════════════════════════
+//  CALC
+// ══════════════════════════════════════════
+function calcular() {
+  const raw=El('entrada').value.trim();
+  const err=El('errorBox');
+  err.style.display='none'; El('divResultado').style.display='none';
 
-  if (!raw) {
-    errBox.textContent = '⚠ Nenhum dado colado. Cole a tabela e tente novamente.';
-    errBox.style.display = 'block'; return;
+  if(!raw){ err.textContent='⚠ Nenhum dado colado.'; err.style.display='block'; return; }
+  const lines=raw.split(/\r?\n/).filter(l=>l.trim());
+  if(lines.length<2){ err.textContent='⚠ Mínimo: cabeçalho + 1 linha de dados.'; err.style.display='block'; return; }
+
+  const sep=detectSep(lines[0]);
+  const rows=lines.map(l=>l.split(sep).map(c=>c.trim()));
+
+  let headers,dataRows;
+  if(isHeader(rows[0])){ headers=rows[0]; dataRows=rows.slice(1).filter(r=>r.some(c=>c!=='')); }
+  else                  { headers=null;   dataRows=rows.filter(r=>r.some(c=>c!=='')); }
+
+  let idxSis=-1,idxFis=-1,idxSt=-1;
+  if(headers){
+    idxSis=findCol(headers,'qntd sistema','qtd sistema','quantidade sistema','sistema');
+    idxFis=findCol(headers,'qntd fisico','qntd físico','qtd fisico','quantidade fisico','fisico','físico','contado','contagem');
+    idxSt =findCol(headers,'status');
   }
+  if(idxSis<0) idxSis=3;
+  if(idxFis<0) idxFis=4;
 
-  const lines = raw.split(/\r?\n/).filter(l => l.trim());
-  if (lines.length < 2) {
-    errBox.textContent = '⚠ A tabela precisa ter pelo menos uma linha de dados.';
-    errBox.style.display = 'block'; return;
-  }
+  const idxItem=headers?findCol(headers,'item'):0;
+  const idxLoc =headers?findCol(headers,'locator'):2;
+  const idxDesc=headers?findCol(headers,'description','descrição','desc'):5;
+  const cols   =headers?[...headers]:dataRows[0].map((_,i)=>'Col '+(i+1));
+  const useSt  =idxSt>=0;
 
-  const sep     = detectSep(lines[0]);
-  const allRows = lines.map(l => l.split(sep).map(c => c.trim()));
+  let ok=0,div=0,divRows=[],divItems=[];
 
-  let headers, dataRows;
-  if (isHeaderRow(allRows[0])) {
-    headers  = allRows[0];
-    dataRows = allRows.slice(1).filter(r => r.some(c => c !== ''));
-  } else {
-    headers  = null;
-    dataRows = allRows.filter(r => r.some(c => c !== ''));
-  }
-
-  let idxSis = -1, idxFis = -1, idxStatus = -1;
-  if (headers) {
-    idxSis    = findCol(headers, 'qntd sistema', 'qtd sistema', 'quantidade sistema', 'sistema');
-    idxFis    = findCol(headers, 'qntd fisico', 'qntd físico', 'qtd fisico', 'quantidade fisico', 'fisico', 'físico', 'contado', 'contagem');
-    idxStatus = findCol(headers, 'status');
-  }
-  if (idxSis < 0) idxSis = 3;
-  if (idxFis < 0) idxFis = 4;
-
-  const useStatusCol = idxStatus >= 0;
-  let ok = 0, div = 0, divRows = [];
-
-  dataRows.forEach(row => {
+  dataRows.forEach(row=>{
     let isOk;
-    if (useStatusCol) {
-      isOk = norm(row[idxStatus] || '') === 'ok';
-    } else {
-      const sis = toNumber(row[idxSis]);
-      const fis = toNumber(row[idxFis]);
-      isOk = !isNaN(sis) && !isNaN(fis) && sis === fis;
+    if(useSt){ isOk=norm(row[idxSt]||'')==='ok'; }
+    else{ const s=toN(row[idxSis]),f=toN(row[idxFis]); isOk=!isNaN(s)&&!isNaN(f)&&s===f; }
+    if(isOk) ok++;
+    else{
+      div++; divRows.push(row);
+      divItems.push({
+        item: String(row[idxItem>=0?idxItem:0]||''),
+        loc:  String(row[idxLoc>=0?idxLoc:2]||''),
+        sis:  String(row[idxSis]||''),
+        fis:  String(row[idxFis]||''),
+        desc: String(row[idxDesc>=0?idxDesc:row.length-1]||'')
+      });
     }
-    if (isOk) ok++;
-    else { div++; divRows.push(row); }
   });
 
-  const total = ok + div;
-  if (total === 0) {
-    errBox.textContent = '⚠ Nenhuma linha de dados encontrada. Verifique o formato.';
-    errBox.style.display = 'block'; return;
-  }
+  const total=ok+div;
+  if(total===0){ err.textContent='⚠ Nenhuma linha encontrada.'; err.style.display='block'; return; }
 
-  const acc    = (ok / total) * 100;
-  const divPct = 100 - acc;
+  const acc=(ok/total)*100;
 
-  // Update result cards
-  $('cTotal').textContent  = total;
-  $('cOk').textContent     = ok;
-  $('cOkPct').textContent  = fmt(acc);
-  $('cDiv').textContent    = div;
-  $('cDivPct').textContent = fmt(divPct);
-  $('cAcc').textContent    = fmt(acc);
-  $('barPct').textContent  = fmt(acc);
-  $('barFill').style.width = '0%';
-  setTimeout(() => { $('barFill').style.width = acc + '%'; }, 50);
+  El('cTotal').textContent=total;
+  El('cOk').textContent=ok; El('cOkPct').textContent=fmt(acc);
+  El('cDiv').textContent=div; El('cDivPct').textContent=fmt(100-acc);
+  El('cAcc').textContent=fmt(acc);
+  El('progPct').textContent=fmt(acc);
+  El('progFill').style.width='0%';
+  setTimeout(()=>El('progFill').style.width=acc+'%',50);
 
-  // Divergent rows table
-  const tHead = $('tHead'), tBody = $('tBody');
-  tHead.innerHTML = tBody.innerHTML = '';
-  const cols = headers ? [...headers] : dataRows[0].map((_,i) => 'Col '+(i+1));
-  const showStatusCol = !useStatusCol;
+  const chosen=selDate(), todDMY=isoToDMY(todayISO());
+  const dd=Math.round((parseD(todDMY)-parseD(chosen))/86400000);
+  El('resultLabel').textContent=dd===0?`hoje (${chosen})`:dd===1?`ontem (${chosen})`:chosen;
 
-  const htr = document.createElement('tr');
-  cols.forEach(h => { const th = document.createElement('th'); th.textContent = h; htr.appendChild(th); });
-  if (showStatusCol) { const th = document.createElement('th'); th.textContent = 'Status'; htr.appendChild(th); }
-  tHead.appendChild(htr);
+  // Current divergent table
+  const thead=El('divThead'), tbody=El('divTbody');
+  thead.innerHTML=tbody.innerHTML='';
+  const showSt=!useSt;
+  const htr=document.createElement('tr');
+  cols.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; htr.appendChild(th); });
+  if(showSt){ const th=document.createElement('th'); th.textContent='Status'; htr.appendChild(th); }
+  thead.appendChild(htr);
 
-  if (divRows.length === 0) {
-    const etr = document.createElement('tr');
-    const etd = document.createElement('td');
-    etd.colSpan   = cols.length + (showStatusCol ? 1 : 0);
-    etd.style.cssText = 'color:var(--ok);padding:1rem';
-    etd.textContent   = '✅ Nenhuma divergência encontrada!';
-    etr.appendChild(etd); tBody.appendChild(etr);
+  El('detailsSummary').textContent=div===0
+    ?'Itens divergentes (nenhum)'
+    :`Ver itens divergentes (${div} item${div>1?'s':''})`;
+
+  if(div===0){
+    const etr=document.createElement('tr'), etd=document.createElement('td');
+    etd.colSpan=cols.length+(showSt?1:0);
+    etd.style.cssText='color:var(--ok);padding:1rem';
+    etd.textContent='✅ Nenhuma divergência encontrada!';
+    etr.appendChild(etd); tbody.appendChild(etr);
   } else {
-    divRows.forEach(row => {
-      const tr = document.createElement('tr');
-      row.forEach((cell, i) => {
-        const td = document.createElement('td');
-        td.textContent = cell;
-        if (useStatusCol && i === idxStatus) td.className = 'status-div';
-        if (!useStatusCol && (i === idxSis || i === idxFis)) { td.style.fontWeight = '600'; td.style.color = 'var(--warn)'; }
+    divRows.forEach(row=>{
+      const tr=document.createElement('tr');
+      row.forEach((cell,i)=>{
+        const td=document.createElement('td'); td.textContent=cell;
+        if(!useSt&&(i===idxSis||i===idxFis)) td.className='warn-cell';
+        if(useSt&&i===idxSt) td.className='warn-cell';
+        if(i===idxDesc) td.className='desc-cell';
         tr.appendChild(td);
       });
-      if (showStatusCol) {
-        const td = document.createElement('td');
-        td.textContent = '⚠ Divergente'; td.className = 'status-div';
-        tr.appendChild(td);
-      }
-      tBody.appendChild(tr);
+      if(showSt){ const td=document.createElement('td'); td.textContent='⚠ Divergente'; td.className='warn-cell'; tr.appendChild(td); }
+      tbody.appendChild(tr);
     });
   }
 
-  $('resultado').style.display = 'block';
-  $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  El('divResultado').style.display='block';
+  El('divResultado').scrollIntoView({behavior:'smooth',block:'start'});
 
-  // ── Update result header label ──
-  const chosenDate = selectedDateStr();
-  const today      = todayStr();
-  const diff       = Math.round((parseDate(today) - parseDate(chosenDate)) / 86400000);
-  $('resultDateLabel').textContent =
-    diff === 0 ? 'hoje (' + chosenDate + ')' :
-    diff === 1 ? 'ontem (' + chosenDate + ')' :
-    chosenDate;
-
-  // ── Save to history ──
-  const hist  = await storeGet();
-  hist[chosenDate] = { date: chosenDate, total, ok, div, acc };
-  const mode  = await storeSet(hist);
-  await renderHistory();
-
-  const modeLabel = mode === 'artifact' ? 'Claude Storage' : mode === 'local' ? 'localStorage' : 'memória';
-  showToast(`✅ Salvo — ${chosenDate} (${modeLabel})`);
+  // SAVE
+  const record={date:chosen,total,ok,div,acc,divItems};
+  const saved=saveDay(chosen,record);
+  renderHistory();
+  toast(saved?`✅ ${chosen} salvo (${_ls?'localStorage':'memória'})`:`⚠ Erro ao salvar`);
 }
 
-// ═══════════════════════════════════════════════════════
-//  EVENT LISTENERS
-// ═══════════════════════════════════════════════════════
-$('btnCalc').addEventListener('click', calcular);
-
-$('btnClear').addEventListener('click', () => {
-  $('entrada').value = '';
-  $('resultado').style.display = 'none';
-  $('errorBox').style.display  = 'none';
+// ══════════════════════════════════════════
+//  EVENTS
+// ══════════════════════════════════════════
+El('btnCalc').addEventListener('click', calcular);
+El('btnClear').addEventListener('click',()=>{
+  El('entrada').value=''; El('divResultado').style.display='none'; El('errorBox').style.display='none';
+});
+El('entrada').addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.ctrlKey) calcular(); });
+El('inputData').addEventListener('change',()=>{ updateTag(); renderHistory(); });
+El('btnClearHist').addEventListener('click',()=>El('overlay').classList.add('open'));
+El('modalNo').addEventListener('click',()=>El('overlay').classList.remove('open'));
+El('overlay').addEventListener('click',e=>{ if(e.target===El('overlay')) El('overlay').classList.remove('open'); });
+El('modalYes').addEventListener('click',()=>{
+  clearAll(); El('overlay').classList.remove('open');
+  closePanel(); renderHistory(); toast('🗑 Histórico apagado.');
+});
+El('panelClose').addEventListener('click', closePanel);
+El('panelOverlay').addEventListener('click', closePanel);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closePanel(); });
+window.addEventListener('resize',()=>{
+  const h=load(), k=Object.keys(h).sort((a,b)=>parseD(a)-parseD(b));
+  if(k.length>0) drawChart(h,k);
 });
 
-$('entrada').addEventListener('keydown', e => { if (e.key === 'Enter' && e.ctrlKey) calcular(); });
-
-$('btnLimparHist').addEventListener('click', () => $('modalOverlay').classList.add('open'));
-$('modalCancel').addEventListener('click',   () => $('modalOverlay').classList.remove('open'));
-$('modalOverlay').addEventListener('click',  e => { if (e.target === $('modalOverlay')) $('modalOverlay').classList.remove('open'); });
-
-$('modalConfirm').addEventListener('click', async () => {
-  await storeDel();
-  $('modalOverlay').classList.remove('open');
-  await renderHistory();
-  showToast('🗑 Histórico apagado.');
-});
-
-// ── Init ──
-// Set date picker to today by default
-(function initDate() {
-  const t = new Date();
-  const iso = t.getFullYear() + '-' +
-              String(t.getMonth()+1).padStart(2,'0') + '-' +
-              String(t.getDate()).padStart(2,'0');
-  $('inputData').value = iso;
-  $('inputData').max   = iso;   // can't pick future dates
-  updateDateTag();
+// INIT
+initStorage();
+(()=>{
+  const iso=todayISO();
+  El('inputData').value=iso; El('inputData').max=iso; updateTag();
 })();
-
-$('inputData').addEventListener('change', updateDateTag);
-
-detectStorageMode();
 renderHistory();
 </script>
 </body>
