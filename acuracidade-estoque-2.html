@@ -236,7 +236,13 @@ M000000688	71MG51ALM	7B-6A3	2	1	BROCA ESPECIAL ..."></textarea>
   <input type="date" id="inputData">
   <span class="date-tag" id="dateTag"></span>
 </div>
-<div class="info-pill">Regra: <b>OK</b> = Qtd Sistema = Qtd Físico &nbsp;|&nbsp; <b>Divergente</b> = valores diferentes</div>
+<div class="date-wrap">
+  <label for="chkAcumular" style="cursor:pointer;display:flex;align-items:center;gap:.4rem">
+    <input type="checkbox" id="chkAcumular" checked style="accent-color:var(--accent);width:14px;height:14px;cursor:pointer">
+    🔗 Somar com inventário já existente nesta data (acumulativo)
+  </label>
+</div>
+<div class="info-pill">Regra: <b>OK</b> = Qtd Sistema = Qtd Físico &nbsp;|&nbsp; <b>Divergente</b> = valores diferentes &nbsp;|&nbsp; itens com o <b>mesmo código</b> têm as quantidades <b>somadas</b> automaticamente</div>
 <div class="store-pill"><span class="dot" id="storeDot"></span><span id="storeLabel">verificando…</span></div>
 <div class="error-box" id="errorBox"></div>
 
@@ -411,9 +417,150 @@ function toast(msg){
   const t=El('toast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3000);
 }
-function detectSep(l){
-  const t=(l.match(/\t/g)||[]).length,c=(l.match(/,/g)||[]).length,s=(l.match(/;/g)||[]).length;
-  return t>=c&&t>=s?'\t':s>c?';':',';
+/**
+ * Conta quantas vezes um separador aparece em cada linha e mede o
+ * quão "consistente" ele é (ou seja, se a maioria das linhas tem o
+ * MESMO número de ocorrências — sinal de que é mesmo um delimitador
+ * de colunas, e não um caractere que apareceu por acaso dentro de um
+ * texto livre, como a vírgula em "6,8MM").
+ */
+function sepConsistency(lines, regex){
+  const counts = lines.map(l=>(l.match(regex)||[]).length).filter(c=>c>0);
+  if(counts.length===0) return {score:0,count:0};
+  const freq={};
+  counts.forEach(c=>freq[c]=(freq[c]||0)+1);
+  let bestCount=0,bestFreq=0;
+  Object.keys(freq).forEach(c=>{ if(freq[c]>bestFreq){ bestFreq=freq[c]; bestCount=Number(c); } });
+  return { score: bestFreq/lines.length, count: bestCount };
+}
+
+function detectSep(allLines){
+  // Examina TODAS as linhas coladas (não só a primeira) para decidir o
+  // separador — e exige que ele apareça de forma CONSISTENTE (mesma
+  // quantidade) na maioria das linhas, para não confundir uma vírgula
+  // ou ponto-e-vírgula soltos dentro de uma descrição com um delimitador
+  // de verdade.
+  const lines = (Array.isArray(allLines) ? allLines : String(allLines).split('\n')).filter(l=>l.trim()!=='');
+  if(lines.length===0) return 'SPACES';
+
+  const tab = sepConsistency(lines, /\t/g);
+  if(tab.count>0 && tab.score>=0.6) return '\t';
+
+  const semi  = sepConsistency(lines, /;/g);
+  const comma = sepConsistency(lines, /,/g);
+  const candidates = [{sep:';',...semi},{sep:',',...comma}].filter(c=>c.count>0 && c.score>=0.6);
+  if(candidates.length>0){
+    candidates.sort((a,b)=> b.score-a.score || b.count-a.count);
+    return candidates[0].sep;
+  }
+
+  // Nenhum separador "de verdade" encontrado: muito comum quando a
+  // colagem vem do celular/PDF/app e o TAB do Excel é convertido em
+  // vários espaços em branco para manter o alinhamento visual das
+  // colunas. Nesse caso usamos 2+ espaços seguidos como separador.
+  return 'SPACES';
+}
+
+/**
+ * Divide uma linha em colunas, respeitando o separador detectado.
+ * No modo 'SPACES', só considera coluna nova a cada bloco de 2+
+ * espaços — um único espaço dentro de uma descrição (ex: "BROCA DIA")
+ * continua fazendo parte da mesma célula.
+ */
+function splitRow(line, sep){
+  if(sep==='SPACES') return line.trim().split(/\s{2,}/).map(c=>c.trim());
+  return line.split(sep).map(c=>c.trim());
+}
+
+/**
+ * Em tabelas alinhadas só por espaços (modo 'SPACES'), o espaçamento
+ * ENTRE colunas pode variar — às vezes 1 espaço, às vezes vários —
+ * então não dá pra confiar em "split por 2+ espaços" para achar onde
+ * cada coluna começa. Em vez disso, procuramos a posição de cada nome
+ * de campo CONHECIDO (Item, Subinventory, Locator, Qntd Sistema,
+ * Qntd Físico, Description...) diretamente no texto do cabeçalho —
+ * isso funciona mesmo que dois cabeçalhos fiquem colados com um único
+ * espaço entre si, como em "Locator Qntd sistema".
+ */
+function findFieldPositions(headerLineRaw){
+  const lower = headerLineRaw.toLowerCase();
+  const found = {};
+  Object.keys(FIELD_CANDIDATES).forEach(field=>{
+    let bestIdx=-1;
+    FIELD_CANDIDATES[field].forEach(cand=>{
+      const idx = lower.indexOf(cand.toLowerCase());
+      if(idx>=0 && (bestIdx===-1 || idx<bestIdx)) bestIdx=idx;
+    });
+    if(bestIdx>=0) found[field]=bestIdx;
+  });
+  return found;
+}
+
+/**
+ * Tenta montar o parser "por nome de campo": localiza Item, Qntd
+ * Sistema e Qntd Físico (mínimo necessário) no cabeçalho e fatia
+ * todas as linhas de dados nessas mesmas posições de coluna.
+ * Retorna null se não achar campos suficientes (a chamadora deve
+ * usar outra estratégia de fallback nesse caso).
+ */
+function parseByFieldNames(headerLineRaw, rawDataLines){
+  const positions = findFieldPositions(headerLineRaw);
+  if(positions.item===undefined || positions.sis===undefined || positions.fis===undefined) return null;
+
+  const order = Object.keys(positions).sort((a,b)=>positions[a]-positions[b]);
+  const idx = {};
+  order.forEach((field,i)=>{ idx[field]=i; });
+  // Campos não encontrados no cabeçalho ficam com índice -1 (ausentes)
+  Object.keys(FIELD_CANDIDATES).forEach(f=>{ if(!(f in idx)) idx[f]=-1; });
+
+  const dataRows = rawDataLines.map(line=>{
+    const row = order.map((field,i)=>{
+      const start = positions[field];
+      const next  = order[i+1];
+      const end   = next ? positions[next] : line.length;
+      return line.substring(start, end).trim();
+    });
+    // Pós-processamento: "Qntd Sistema"/"Qntd Físico" devem conter
+    // apenas o número. Como o rótulo "Description" no cabeçalho pode
+    // ficar mais à direita do que onde o texto da descrição realmente
+    // começa na linha de dados, a fatia de sis/fis às vezes "engole"
+    // o início da descrição — aqui devolvemos esse texto sobrando.
+    ['sis','fis'].forEach(f=>{
+      const i = idx[f];
+      if(i===undefined || i<0 || !row[i]) return;
+      const m = row[i].match(/^-?[\d.,]+/);
+      if(m && m[0].length < row[i].length){
+        const leftover = row[i].slice(m[0].length).trim();
+        row[i] = m[0];
+        if(leftover && idx.desc>=0){
+          row[idx.desc] = (leftover + (row[idx.desc]||'')).trim();
+        }
+      }
+    });
+    return row;
+  });
+  return { idx, dataRows };
+}
+
+/**
+ * Garante que toda linha tenha o mesmo número de colunas do cabeçalho
+ * (ou da linha mais comum, se não houver cabeçalho). O Excel às vezes
+ * cola linhas com uma coluna a menos (célula vazia no fim) ou a mais
+ * (separador sobrando) — sem isso, os valores "deslizam" para a
+ * coluna errada nas linhas seguintes.
+ */
+function normalizeRowLengths(rows, targetLen){
+  if(!targetLen){
+    const counts={};
+    rows.forEach(r=>{ counts[r.length]=(counts[r.length]||0)+1; });
+    targetLen = Object.keys(counts).reduce((a,b)=>counts[a]>counts[b]?a:b);
+    targetLen = Number(targetLen);
+  }
+  return rows.map(r=>{
+    if(r.length===targetLen) return r;
+    if(r.length<targetLen) return [...r, ...Array(targetLen-r.length).fill('')];
+    return r.slice(0,targetLen);
+  });
 }
 function isHeader(row){
   const j=row.join(' ').toLowerCase();
@@ -425,6 +572,157 @@ function findCol(hdrs,...cands){
   return -1;
 }
 function accCls(v){ return v>=99?'acc-h':v>=95?'acc-m':'acc-l'; }
+function round2(n){ return Math.round((Number(n)||0)*100)/100; }
+
+// ══════════════════════════════════════════
+//  CONSOLIDAÇÃO INTELIGENTE DE ITENS
+//  ------------------------------------------------
+//  Aqui mora a "inteligência" da ferramenta:
+//  - reconhece o item pelo seu código/SKU, não pela posição da linha
+//  - funciona mesmo que o usuário cole as colunas em ordem diferente
+//  - aceita variações de nome de cabeçalho (ex: "Subinventory",
+//    "Sub-Inventory", "Depósito" etc.) via findCol() + norm()
+//  - quando o mesmo código aparece mais de uma vez (seja porque o
+//    item está em vários endereços, seja porque o usuário colou um
+//    novo lote de dados depois), as quantidades de sistema e físico
+//    são SOMADAS automaticamente em vez de sobrescritas
+// ══════════════════════════════════════════
+
+/**
+ * Detecta em quais colunas estão as informações relevantes,
+ * tentando vários nomes/variações possíveis para cada campo.
+ */
+// Lista única de "apelidos" aceitos para cada campo — usada tanto na
+// detecção por cabeçalho normal (mapColumns) quanto no parser por
+// posição de nome de campo (usado quando o texto colado está alinhado
+// só por espaços, ver parseByFieldNames mais abaixo).
+const FIELD_CANDIDATES = {
+  item:   ['item','peça','peca','codigo','código','sku','part number','cod item','material','cod'],
+  sis:    ['qntd sistema','qtd sistema','quantidade sistema','sistema','qtd_sistema','estoque sistema'],
+  fis:    ['qntd fisico','qntd físico','qntd fisica','qntd física','qtd fisico','qtd físico','qtd fisica','qtd física','quantidade fisico','quantidade físico','quantidade fisica','quantidade física','fisico','físico','fisica','física','contado','contagem','estoque fisico','estoque fisica'],
+  loc:    ['locator','localizacao','localização','endereco','endereço','rua/predio','posicao','posição'],
+  subinv: ['subinventory','sub-inventory','sub inventory','subinv','deposito','depósito','armazem','armazém'],
+  desc:   ['description','descrição','descricao','desc','etiqueta'],
+  status: ['status'],
+};
+
+function mapColumns(headers){
+  const idx = {};
+  Object.keys(FIELD_CANDIDATES).forEach(f=>{
+    idx[f] = headers ? findCol(headers, ...FIELD_CANDIDATES[f]) : -1;
+  });
+  // Fallbacks para quando não há cabeçalho identificável (mantém
+  // compatibilidade com o layout padrão: Item / Sub / Locator / Sis / Fis / Desc)
+  if(idx.item<0)  idx.item  = 0;
+  if(idx.sis<0)   idx.sis   = headers?idx.sis:3;
+  if(idx.fis<0)   idx.fis   = headers?idx.fis:4;
+  if(!headers){
+    idx.loc=2; idx.subinv=1; idx.desc=5;
+  }
+  return idx;
+}
+
+/**
+ * Normaliza um código de item para servir de chave de consolidação.
+ * Remove espaços nas pontas e ignora diferenças de maiúsculas/minúsculas,
+ * para que "m000000537" e "M000000537 " sejam tratados como o MESMO item.
+ */
+function itemKey(raw){
+  return String(raw||'').trim().toUpperCase().replace(/\s+/g,' ');
+}
+function posKey(raw){
+  return String(raw||'').trim().toUpperCase().replace(/\s+/g,' ');
+}
+
+/**
+ * Chave de identificação de uma linha: código do item + posição
+ * (Subinventory/Locator). Ou seja, o MESMO item em DUAS posições
+ * diferentes é tratado como duas linhas distintas no resultado —
+ * só soma quando é o mesmo item NA MESMA posição.
+ */
+function rowKey(itemRaw, subinv, loc){
+  return itemKey(itemRaw) + '@@' + posKey(subinv) + '/' + posKey(loc);
+}
+
+/**
+ * Consolida as linhas de dados em um Map<chave, itemConsolidado>,
+ * onde a chave é (item + subinventory + locator). Se a MESMA
+ * combinação item+posição aparecer em mais de uma linha (ex: a
+ * contagem do mesmo local foi colada duas vezes), as quantidades são
+ * somadas — itens iguais em posições diferentes NÃO se misturam.
+ */
+function consolidateRows(dataRows, idx){
+  const map = new Map();
+  dataRows.forEach(row=>{
+    const itemRaw = row[idx.item];
+    if(!itemKey(itemRaw)) return; // linha sem identificador de item é ignorada
+
+    const sis  = toN(row[idx.sis]);
+    const fis  = toN(row[idx.fis]);
+    const loc  = idx.loc>=0    ? String(row[idx.loc]||'').trim()    : '';
+    const desc = idx.desc>=0   ? String(row[idx.desc]||'').trim()   : '';
+    const sub  = idx.subinv>=0 ? String(row[idx.subinv]||'').trim() : '';
+    const key  = rowKey(itemRaw, sub, loc);
+
+    if(!map.has(key)){
+      map.set(key,{ item:String(itemRaw).trim(), subinv:sub, loc:loc, desc:'', sis:0, fis:0 });
+    }
+    const e = map.get(key);
+    if(!isNaN(sis)) e.sis += sis;          // ▸ SOMA automática (mesmo item + mesma posição)
+    if(!isNaN(fis)) e.fis += fis;          // ▸ SOMA automática (mesmo item + mesma posição)
+    if(!e.desc && desc) e.desc = desc;
+    if(!e.subinv && sub) e.subinv = sub;
+    if(!e.loc && loc) e.loc = loc;
+  });
+  return map;
+}
+
+/**
+ * Mescla um novo Map de itens consolidados com os itens já salvos
+ * para a mesma data (permite colar o inventário "aos poucos", em
+ * momentos diferentes, e ir acumulando o total automaticamente).
+ * A chave já inclui item+posição, então o merge naturalmente respeita
+ * a regra "mesmo item em posição diferente = linha diferente".
+ */
+function mergeItemMaps(existingItems, newMap){
+  const merged = {};
+  Object.keys(existingItems||{}).forEach(k=>{
+    const o = existingItems[k];
+    merged[k] = { item:o.item, subinv:o.subinv||'', loc:o.loc||'', desc:o.desc||'', sis:Number(o.sis)||0, fis:Number(o.fis)||0 };
+  });
+  newMap.forEach((v,k)=>{
+    if(merged[k]){
+      merged[k].sis += v.sis;              // ▸ SOMA com o que já existia no dia (mesma posição)
+      merged[k].fis += v.fis;              // ▸ SOMA com o que já existia no dia (mesma posição)
+      if(!merged[k].desc && v.desc) merged[k].desc = v.desc;
+      if(!merged[k].subinv && v.subinv) merged[k].subinv = v.subinv;
+      if(!merged[k].loc && v.loc) merged[k].loc = v.loc;
+    } else {
+      merged[k] = { item:v.item, subinv:v.subinv||'', loc:v.loc||'', desc:v.desc||'', sis:v.sis, fis:v.fis };
+    }
+  });
+  return merged;
+}
+
+/**
+ * A partir do objeto de itens já consolidados, calcula os totais
+ * (OK, divergentes, acuracidade) e a lista de itens divergentes.
+ */
+function computeStats(itemsObj){
+  const keys = Object.keys(itemsObj);
+  let ok=0, divItems=[];
+  keys.forEach(k=>{
+    const it=itemsObj[k];
+    const s=round2(it.sis), f=round2(it.fis);
+    if(s===f) ok++;
+    else divItems.push({ item:it.item, loc:[it.subinv,it.loc].filter(Boolean).join(' / ')||'—', sis:s, fis:f, desc:it.desc||'' });
+  });
+  const total = keys.length;
+  const div   = total - ok;
+  const acc   = total>0 ? (ok/total)*100 : 0;
+  divItems.sort((a,b)=>a.item.localeCompare(b.item));
+  return { total, ok, div, acc, divItems };
+}
 
 // ══════════════════════════════════════════
 //  DAY DETAIL PANEL
@@ -479,7 +777,7 @@ function openPanel(date) {
       <div class="panel-tbl-wrap">
         <table class="panel-tbl">
           <thead><tr>
-            <th>#</th><th>Item</th><th>Locator</th>
+            <th>#</th><th>Item</th><th>Subinventory / Locator</th>
             <th>Qtd Sistema</th><th>Qtd Físico</th>
             <th>Descrição</th><th>Status</th>
           </tr></thead>
@@ -701,53 +999,69 @@ function calcular() {
 
   if(!raw){ err.textContent='⚠ Nenhum dado colado.'; err.style.display='block'; return; }
   const lines=raw.split(/\r?\n/).filter(l=>l.trim());
-  if(lines.length<2){ err.textContent='⚠ Mínimo: cabeçalho + 1 linha de dados.'; err.style.display='block'; return; }
+  if(lines.length<1){ err.textContent='⚠ Cole ao menos uma linha com um item.'; err.style.display='block'; return; }
 
-  const sep=detectSep(lines[0]);
-  const rows=lines.map(l=>l.split(sep).map(c=>c.trim()));
+  const sep=detectSep(lines);
+  let rows=lines.map(l=>splitRow(l, sep));
 
-  let headers,dataRows;
-  if(isHeader(rows[0])){ headers=rows[0]; dataRows=rows.slice(1).filter(r=>r.some(c=>c!=='')); }
-  else                  { headers=null;   dataRows=rows.filter(r=>r.some(c=>c!=='')); }
-
-  let idxSis=-1,idxFis=-1,idxSt=-1;
-  if(headers){
-    idxSis=findCol(headers,'qntd sistema','qtd sistema','quantidade sistema','sistema');
-    idxFis=findCol(headers,'qntd fisico','qntd físico','qtd fisico','quantidade fisico','fisico','físico','contado','contagem');
-    idxSt =findCol(headers,'status');
-  }
-  if(idxSis<0) idxSis=3;
-  if(idxFis<0) idxFis=4;
-
-  const idxItem=headers?findCol(headers,'item'):0;
-  const idxLoc =headers?findCol(headers,'locator'):2;
-  const idxDesc=headers?findCol(headers,'description','descrição','desc'):5;
-  const cols   =headers?[...headers]:dataRows[0].map((_,i)=>'Col '+(i+1));
-  const useSt  =idxSt>=0;
-
-  let ok=0,div=0,divRows=[],divItems=[];
-
-  dataRows.forEach(row=>{
-    let isOk;
-    if(useSt){ isOk=norm(row[idxSt]||'')==='ok'; }
-    else{ const s=toN(row[idxSis]),f=toN(row[idxFis]); isOk=!isNaN(s)&&!isNaN(f)&&s===f; }
-    if(isOk) ok++;
-    else{
-      div++; divRows.push(row);
-      divItems.push({
-        item: String(row[idxItem>=0?idxItem:0]||''),
-        loc:  String(row[idxLoc>=0?idxLoc:2]||''),
-        sis:  String(row[idxSis]||''),
-        fis:  String(row[idxFis]||''),
-        desc: String(row[idxDesc>=0?idxDesc:row.length-1]||'')
-      });
+  // 1) Detecta se a primeira linha é cabeçalho e mapeia as colunas
+  //    relevantes — independente da ordem em que vierem.
+  let headers,dataRows,idx;
+  if(rows.length>1 && isHeader(rows[0])){
+    headers=rows[0];
+    if(sep==='SPACES'){
+      // Tabela alinhada só por espaços: tenta localizar as colunas
+      // PELO NOME (Item, Qntd Sistema, Qntd Físico...) diretamente no
+      // texto do cabeçalho — não depende de quantos espaços separam
+      // cada coluna, então funciona mesmo com espaçamento irregular.
+      const byName = parseByFieldNames(lines[0], lines.slice(1).filter(l=>l.trim()!==''));
+      if(byName){
+        idx = byName.idx;
+        dataRows = byName.dataRows;
+      } else {
+        // fallback: split genérico por 2+ espaços
+        dataRows = normalizeRowLengths(rows.slice(1).filter(r=>r.some(c=>c!=='')), headers.length);
+      }
+    } else {
+      dataRows=normalizeRowLengths(rows.slice(1).filter(r=>r.some(c=>c!=='')), headers.length);
     }
-  });
+  } else {
+    headers=null;
+    dataRows=normalizeRowLengths(rows.filter(r=>r.some(c=>c!=='')));
+  }
 
-  const total=ok+div;
-  if(total===0){ err.textContent='⚠ Nenhuma linha encontrada.'; err.style.display='block'; return; }
+  if(dataRows.length===0){ err.textContent='⚠ Nenhuma linha de dados encontrada.'; err.style.display='block'; return; }
 
-  const acc=(ok/total)*100;
+  if(!idx) idx = mapColumns(headers);
+  if(idx.sis<0 || idx.fis<0){
+    err.textContent='⚠ Não localizei as colunas de "Qtd Sistema" e "Qtd Físico". Inclua um cabeçalho com esses nomes (ou variações, como "Quantidade Sistema").';
+    err.style.display='block';
+    return;
+  }
+
+  // 2) Consolida as linhas coladas agora: o mesmo código de item,
+  //    mesmo que apareça em ordens/colunas diferentes, é somado.
+  const newMap = consolidateRows(dataRows, idx);
+  if(newMap.size===0){
+    err.textContent='⚠ Nenhuma linha com um código de item válido foi encontrada.';
+    err.style.display='block';
+    return;
+  }
+
+  const chosen=selDate();
+
+  // 3) Acumula com o que já estava salvo para essa MESMA data —
+  //    é assim que colagens em "momentos diferentes" se somam.
+  //    O usuário pode desligar isso (checkbox) para substituir o dia.
+  const acumular     = El('chkAcumular').checked;
+  const histBefore   = load();
+  const existingRec  = histBefore[chosen];
+  const baseItems    = acumular && existingRec ? existingRec.items : null;
+  const mergedItems  = mergeItemMaps(baseItems, newMap);
+  const wasAccumul   = acumular && !!(existingRec && existingRec.items && Object.keys(existingRec.items).length>0);
+
+  // 4) Recalcula os totais a partir da base já consolidada.
+  const { total, ok, div, acc, divItems } = computeStats(mergedItems);
 
   El('cTotal').textContent=total;
   El('cOk').textContent=ok; El('cOkPct').textContent=fmt(acc);
@@ -757,17 +1071,16 @@ function calcular() {
   El('progFill').style.width='0%';
   setTimeout(()=>El('progFill').style.width=acc+'%',50);
 
-  const chosen=selDate(), todDMY=isoToDMY(todayISO());
+  const todDMY=isoToDMY(todayISO());
   const dd=Math.round((parseD(todDMY)-parseD(chosen))/86400000);
   El('resultLabel').textContent=dd===0?`hoje (${chosen})`:dd===1?`ontem (${chosen})`:chosen;
 
-  // Current divergent table
+  // Tabela de divergências (formato fixo: Item / Local / Sistema / Físico / Descrição)
   const thead=El('divThead'), tbody=El('divTbody');
   thead.innerHTML=tbody.innerHTML='';
-  const showSt=!useSt;
+  const colLabels=['Item','Subinventory / Locator','Qtd Sistema','Qtd Físico','Diferença','Descrição'];
   const htr=document.createElement('tr');
-  cols.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; htr.appendChild(th); });
-  if(showSt){ const th=document.createElement('th'); th.textContent='Status'; htr.appendChild(th); }
+  colLabels.forEach(h=>{ const th=document.createElement('th'); th.textContent=h; htr.appendChild(th); });
   thead.appendChild(htr);
 
   El('detailsSummary').textContent=div===0
@@ -776,21 +1089,22 @@ function calcular() {
 
   if(div===0){
     const etr=document.createElement('tr'), etd=document.createElement('td');
-    etd.colSpan=cols.length+(showSt?1:0);
+    etd.colSpan=colLabels.length;
     etd.style.cssText='color:var(--ok);padding:1rem';
     etd.textContent='✅ Nenhuma divergência encontrada!';
     etr.appendChild(etd); tbody.appendChild(etr);
   } else {
-    divRows.forEach(row=>{
+    divItems.forEach(it=>{
       const tr=document.createElement('tr');
-      row.forEach((cell,i)=>{
+      const diff=round2(it.fis-it.sis);
+      const diffStr=(diff>0?'+':'')+String(diff).replace('.',',');
+      const cells=[it.item, it.loc, it.sis, it.fis, diffStr, it.desc];
+      cells.forEach((cell,i)=>{
         const td=document.createElement('td'); td.textContent=cell;
-        if(!useSt&&(i===idxSis||i===idxFis)) td.className='warn-cell';
-        if(useSt&&i===idxSt) td.className='warn-cell';
-        if(i===idxDesc) td.className='desc-cell';
+        if(i===2||i===3||i===4) td.className='warn-cell';
+        if(i===5) td.className='desc-cell';
         tr.appendChild(td);
       });
-      if(showSt){ const td=document.createElement('td'); td.textContent='⚠ Divergente'; td.className='warn-cell'; tr.appendChild(td); }
       tbody.appendChild(tr);
     });
   }
@@ -798,11 +1112,20 @@ function calcular() {
   El('divResultado').style.display='block';
   El('divResultado').scrollIntoView({behavior:'smooth',block:'start'});
 
-  // SAVE
-  const record={date:chosen,total,ok,div,acc,divItems};
+  // SAVE — guarda também o mapa de itens consolidado ("items"), para
+  // que uma próxima colagem na mesma data continue somando em cima dele.
+  const record={date:chosen,total,ok,div,acc,divItems,items:mergedItems};
   const saved=saveDay(chosen,record);
   renderHistory();
-  toast(saved?`✅ ${chosen} salvo (${_ls?'localStorage':'memória'})`:`⚠ Erro ao salvar`);
+
+  const linhasColadas=dataRows.length, itensUnicos=newMap.size;
+  let msg;
+  if(!saved)            msg='⚠ Erro ao salvar';
+  else if(wasAccumul)   msg=`✅ ${chosen} atualizado — quantidades somadas ao inventário já existente (total agora: ${total} itens)`;
+  else if(!acumular && existingRec) msg=`✅ ${chosen} substituído — inventário anterior dessa data foi recalculado do zero`;
+  else if(linhasColadas>itensUnicos) msg=`✅ ${chosen} salvo — ${linhasColadas} linhas consolidadas em ${itensUnicos} itens únicos`;
+  else                   msg=`✅ ${chosen} salvo (${_ls?'localStorage':'memória'})`;
+  toast(msg);
 }
 
 // ══════════════════════════════════════════
